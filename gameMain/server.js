@@ -1,3 +1,5 @@
+// code from https://hackernoon.com/how-to-build-a-multiplayer-browser-game-4a793818c29b
+
 // dependencies
 var socketIO = require('socket.io');
 var express = require('express');
