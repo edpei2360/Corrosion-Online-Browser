@@ -27,10 +27,6 @@ server.listen(5000, function() {
 io.on('connection', function(socket) {
 });
 
-// Add the WebSocket handlers upon user connection
-io.on('connection', function(socket) {
-});
-
 // send message to sockets (test)
 setInterval(function() {
   io.sockets.emit('message', 'hi!');
