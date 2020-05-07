@@ -21,8 +21,8 @@ function loadShader(gl, type, location) {
 	gl.compileShader(shader);
 
 	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-	gl.deleteShader(shader);
 		throw 'An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader)
+		gl.deleteShader(shader);
 	}
 
 	return shader;
