@@ -1,3 +1,5 @@
+import {gl} from "/glManager.js"
+
 //gets shader source code
 function loadFile(filePath) {
 	var result = null;
@@ -14,7 +16,7 @@ function loadFile(filePath) {
 }
 
 //compiles shader source code
-function loadShader(gl, type, location) {
+function loadShader(type, location) {
 	const source = loadFile(location);
 	const shader = gl.createShader(type);
 	gl.shaderSource(shader, source);
@@ -29,10 +31,10 @@ function loadShader(gl, type, location) {
 }
 
 export class Shader {
-    constructor(gl, vsSrc, fsSrc) {
+    constructor(vsSrc, fsSrc) {
 		//compile shaders
-        const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSrc);
-        const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSrc);
+        const vertexShader = loadShader(gl.VERTEX_SHADER, vsSrc);
+        const fragmentShader = loadShader(gl.FRAGMENT_SHADER, fsSrc);
         
         //attach shaders
         const shaderProgram = gl.createProgram();
@@ -49,23 +51,23 @@ export class Shader {
     }
     
     //bind shader for use
-    use(gl) {
+    use() {
 		gl.useProgram(this.shaderProgram);
 	}
     
     //add a attribute to the shader
-    addAttribute(gl, attrib) {
+    addAttribute(attrib) {
 		this[attrib] = gl.getAttribLocation(this.shaderProgram, attrib);
 	}
 	
 	/*TODO allow for multiple types of uniforms not just mat4*/
 	//add a uniform to the shader
-	addUniform(gl, uni) {
+	addUniform(uni) {
 		this[uni] = gl.getUniformLocation(this.shaderProgram, uni);
 	}
 	/*TODO allow for multiple types of uniforms not just mat4*/
 	//change the value of a uniform of a shader
-	setUniform(gl, uni, val) {
+	setUniform(uni, val) {
 		gl.uniformMatrix4fv(this[uni], false, val);
 	}
 }

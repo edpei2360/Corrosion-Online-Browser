@@ -1,3 +1,6 @@
+import {VertexBuffer} from '/vertexbuffer.js'
+import {gl} from "/glManager.js"
+
 class Layout {
 	constructor(name, num, type) { 
 		this.name = name;
@@ -6,7 +9,7 @@ class Layout {
 	}
 }
 
-function sizeof(gl, type) {
+function sizeof(type) {
 	if (type === gl.FLOAT) {
 		return 4;
 	} else {
@@ -16,15 +19,16 @@ function sizeof(gl, type) {
 
 export class VertexArray {
 	static bound = -1;
-    constructor(gl) {
+    constructor() {
 		this.rendererID = gl.createVertexArray();
+		this.use();
 		this.layout = [];
 		this.stride = 0;
-		
-		this.use(gl);
+		this.vb = new VertexBuffer();
+		this.vertexCount = 0;
 	}
 	
-	use(gl) {
+	use() {
 		gl.bindVertexArray(this.rendererID);
 	}
 	
@@ -35,12 +39,12 @@ export class VertexArray {
 	 * type: type to interpret
 	 * example  addAttributes("aPosition", 2, gl.FLOAT)
 	 * */
-	addAttribute(gl, name, num, type) {
+	addAttribute(name, num, type) {
 		this.layout.push(new Layout(name, num, type))
-		this.stride += sizeof(gl, type) * num;
+		this.stride += sizeof(type) * num;
 	}
 	
-	setAttributes(gl, shader) {
+	setAttributes(shader) {
 		var offset = 0;
 		for (var i = 0; i < this.layout.length; i++) {
 			const item = this.layout[i];
@@ -52,8 +56,33 @@ export class VertexArray {
 				this.stride,
 				offset);
 			gl.enableVertexAttribArray(shader[item.name]);
-			offset += sizeof(gl, item.type) * item.num;
+			offset += sizeof(item.type) * item.num;
 		}
+	}
+	
+	getVertexBuffer() {
+		return this.vb;
+	}
+	
+	setData(offset, data) {
+		this.use();
+		this.vb.setData(offset, data);
+	}
+	
+	remove() {
+		throw "Not Implemented";
+	}
+	
+	getVertexCount() {
+		return this.vertexCount;
+	}
+	
+	addVertexs(amount) {
+		this.vertexCount += amount;
+	}
+	
+	removeVertexs(amount) {
+		this.vertexCount -= amount;
 	}
 }
 	

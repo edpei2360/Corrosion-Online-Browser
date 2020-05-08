@@ -1,26 +1,20 @@
-/*
- * TODO
- * 	find good defualt size for VB
- *  way to add rects
- * 	overflow protection/use multiple vbs
-*/
+import {vertexBufferSize} from "/globals.js"
+import {gl} from "/glManager.js"
+
 export class VertexBuffer {
 	static bound = -1;
-    constructor(gl) {
+    constructor() {
 		this.rendererID = gl.createBuffer();
-		this.use(gl)
-		gl.bufferData(gl.ARRAY_BUFFER, 1024, gl.DYNAMIC_DRAW);
+		this.use();
+		gl.bufferData(gl.ARRAY_BUFFER, vertexBufferSize, gl.DYNAMIC_DRAW);
 	}
 	
-	use(gl) {
+	use() {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.rendererID);
 	}
 	
-	//check if data will overflow buffer ???
-	setData(gl, offset, data) {
-		this.use(gl);
+	setData(offset, data) {
+		this.use();
 		gl.bufferSubData(gl.ARRAY_BUFFER, offset, new Float32Array(data));
 	}
-	
-	addRect(gl) {}
 }
