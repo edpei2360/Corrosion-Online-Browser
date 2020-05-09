@@ -67,7 +67,7 @@ setInterval(function() {
 /* TODO: Implement using webgl
          Implement drawing for other entities
          ensure player movement is persistent across different devices
-         get rid of random lag jumps ... dont know why it even happens
+         get rid of random lag jumps ... using the fucking interpolation method
          better organize your code
 */
 

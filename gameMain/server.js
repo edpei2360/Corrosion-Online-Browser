@@ -27,6 +27,7 @@ io.on('connection', function(socket) {
 
 
     socket.on('disconnect', function () {
+      delete players[socket.id]
         console.log('A user disconnected');
     });
 });
@@ -59,16 +60,16 @@ io.on('connection', function(socket) {
     // to send data every 60th of a second
     var player = players[socket.id] || {};
     if (data.left) {
-      player.x_pos_player -= 5 * (( data.time_modification / (1000 / 60)));
+      player.x_pos_player -= 3 * (( data.time_modification / (1000 / 60)));
     }
     if (data.up) {
-      player.y_pos_player -= 5 * (( data.time_modification / (1000 / 60)));
+      player.y_pos_player -= 3 * (( data.time_modification / (1000 / 60)));
     }
     if (data.right) {
-      player.x_pos_player += 5 * (( data.time_modification / (1000 / 60)));
+      player.x_pos_player += 3 * (( data.time_modification / (1000 / 60)));
     }
     if (data.down) {
-      player.y_pos_player += 5 * (( data.time_modification / (1000 / 60)));
+      player.y_pos_player += 3 * (( data.time_modification / (1000 / 60)));
     }
   });
 });
