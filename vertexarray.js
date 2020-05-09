@@ -19,7 +19,7 @@ function sizeof(type) {
 
 export class VertexArray {
 	static bound = -1;
-    constructor() {
+	constructor() {
 		this.rendererID = gl.createVertexArray();
 		this.use();
 		this.layout = [];
@@ -70,7 +70,8 @@ export class VertexArray {
 	}
 	
 	remove() {
-		throw "Not Implemented";
+		gl.deleteVertexArray(this.rendererID);
+		this.vb.remove();
 	}
 	
 	getVertexCount() {
@@ -85,4 +86,3 @@ export class VertexArray {
 		this.vertexCount -= amount;
 	}
 }
-	

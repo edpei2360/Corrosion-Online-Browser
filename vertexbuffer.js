@@ -3,7 +3,7 @@ import {gl} from "/glManager.js"
 
 export class VertexBuffer {
 	static bound = -1;
-    constructor() {
+	constructor() {
 		this.rendererID = gl.createBuffer();
 		this.use();
 		gl.bufferData(gl.ARRAY_BUFFER, vertexBufferSize, gl.DYNAMIC_DRAW);
@@ -16,5 +16,9 @@ export class VertexBuffer {
 	setData(offset, data) {
 		this.use();
 		gl.bufferSubData(gl.ARRAY_BUFFER, offset, new Float32Array(data));
+	}
+	
+	remove() {
+		gl.deleteBuffer(this.rendererID);
 	}
 }

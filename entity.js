@@ -1,9 +1,9 @@
 import {vertexSize, elementsPerEntity} from "/globals.js"
-import {getEntity, setData} from "/glManager.js"
+import {getEntity, setData, removeEntity} from "/glManager.js"
 
 export class Entity {
 	constructor() {
-		this.vertexs = getEntity();
+		getEntity(this);// sets this.vertexs and this.index
 		
 		//init data to 0's
 		var vertexData = [];
@@ -15,11 +15,11 @@ export class Entity {
 	
 	setVertexs(data) {
 		if (data.length != elementsPerEntity) throw "Data not proper len";
-		setData(this.vertexs, data);
+		setData(this, data);
 		this.vertexData = data;
 	}
 	
 	remove() {
-		throw "Not implemented";
+		removeEntity(this);
 	}
 }
