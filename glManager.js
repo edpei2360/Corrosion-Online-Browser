@@ -6,18 +6,6 @@ import {ortho, idmat4} from "/math.js"
 export var gl;
 export var mainShader;
 
-const vertexArrays = [];
-const entityArray = [];
-class VertexArrayIndex {
-	constructor(vertexArray, offset) {
-		this.vertexArray = vertexArray;
-		this.offset = offset;
-	}
-}
-
-var vertexArrayEnd = new VertexArrayIndex(0,0);
-var drawLoop = null;
-
 export function glInit() {
 	const canvas = document.querySelector("#glCanvas");
 	// Initialize the GL context
@@ -28,7 +16,7 @@ export function glInit() {
 		alert("Unable to initialize WebGL. Your browser or machine may not support it.");
 		return;
 	}
-
+	
 	//versions
 	console.log("Shader version: " + gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
 	console.log("Webgl version: " + gl.getParameter(gl.VERSION));
@@ -37,20 +25,41 @@ export function glInit() {
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
 	gl.clearDepth(1.0);                 // Clear everything
 	gl.enable(gl.DEPTH_TEST);           // Enable depth testing
+	//enable transparency
+	gl.enable(gl.BLEND)
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	
 	gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
 
 	//compile main shader
 	mainShader = new Shader("/vs.glsl", "/fs.glsl");
 	mainShader.addAttribute("aVertexPosition");
+	mainShader.addAttribute("aVertexCords");
 	mainShader.addAttribute("aVertexColor");
 	mainShader.addUniform("uProjectionMatrix");
-
+	for (var i = 0; i < 32; i++) {
+		mainShader.addUniform("uProjectionMatrix[" + i + "]");
+	}
+	
 	//init va
 	addVertexArray();
-
-	startDrawLoop();
+	
+	//initTextures();
+	//startLoadingScreen();
+	
+	startDrawLoop();//tmp
 }
 
+class VertexArrayIndex {
+	constructor(vertexArray, offset) {
+		this.vertexArray = vertexArray;
+		this.offset = offset;
+	}
+}
+
+const vertexArrays = [];
+const entityArray = [];
+var vertexArrayEnd = new VertexArrayIndex(0,0);
 //returns new free index(in the vertexArrays) for a entity to use for drawing
 export function getEntity(entity) {
 	entity.index = entityArray.length;
@@ -77,8 +86,8 @@ export function removeEntity(entity) {
 	throw "Not implimented";
 }
 
-export function setData(entity, data) {
-	vertexArrays[entity.vertexs.vertexArray].setData(entity.vertexs.offset, data);
+export function setData(vertexs, data) {
+	vertexArrays[vertexs.vertexArray].setData(vertexs.offset, data);
 }
 
 //tmp
@@ -108,8 +117,9 @@ function draw() {
 function addVertexArray() {
 	const va = new VertexArray();
 	va.use();
-	va.addAttribute("aVertexPosition", 2, gl.FLOAT);
-	va.addAttribute("aVertexColor", 3, gl.FLOAT);
+	va.addAttribute("aVertexPosition", 3, gl.FLOAT);
+	va.addAttribute("aVertexColor", 1, gl.UNSIGNED_INT, true);
+	va.addAttribute("aVertexCords", 1, gl.UNSIGNED_INT, true);
 	va.setAttributes(mainShader);
 	vertexArrays.push(va);
 }
@@ -120,6 +130,7 @@ function removeVertexArray() {
 	removed.remove();
 }
 
+var drawLoop = null;
 function startDrawLoop() {
 	if (drawLoop != null) return;
 	drawLoop = setInterval(draw, 0);
@@ -129,4 +140,20 @@ function endDrawLoop() {
 	if (drawLoop == null) return;
 	clearInterval(drawLoop);
 	drawLoop = null;
+}
+
+function startLoadingScreen() {
+	throw "Not Implemented";
+}
+
+function stopLoadingScreen() {
+	throw "Not Implemented";
+}
+
+function loadingScreenLoop() {
+	throw "Not Implemented";
+}
+
+function initTextures() {
+	throw "Not Implemented";
 }

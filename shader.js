@@ -31,41 +31,40 @@ function loadShader(type, location) {
 }
 
 export class Shader {
-    constructor(vsSrc, fsSrc) {
+	constructor(vsSrc, fsSrc) {
 		//compile shaders
-        const vertexShader = loadShader(gl.VERTEX_SHADER, vsSrc);
-        const fragmentShader = loadShader(gl.FRAGMENT_SHADER, fsSrc);
-        
-        //attach shaders
-        const shaderProgram = gl.createProgram();
-        gl.attachShader(shaderProgram, vertexShader);
-        gl.attachShader(shaderProgram, fragmentShader);
-        gl.linkProgram(shaderProgram);
+		const vertexShader = loadShader(gl.VERTEX_SHADER, vsSrc);
+		const fragmentShader = loadShader(gl.FRAGMENT_SHADER, fsSrc);
+
+		//attach shaders
+		const shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.attachShader(shaderProgram, fragmentShader);
+		gl.linkProgram(shaderProgram);
 		
 		//check for error
-        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-            throw 'Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram);
-        }
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+			throw 'Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram);
+		}
 
-        this.shaderProgram = shaderProgram;
-    }
-    
-    //bind shader for use
-    use() {
+		this.shaderProgram = shaderProgram;
+	}
+
+	//bind shader for use
+	use() {
 		gl.useProgram(this.shaderProgram);
 	}
-    
-    //add a attribute to the shader
-    addAttribute(attrib) {
+
+	//add a attribute to the shader
+	addAttribute(attrib) {
 		this[attrib] = gl.getAttribLocation(this.shaderProgram, attrib);
 	}
 	
-	/*TODO allow for multiple types of uniforms not just mat4*/
 	//add a uniform to the shader
 	addUniform(uni) {
 		this[uni] = gl.getUniformLocation(this.shaderProgram, uni);
 	}
-	/*TODO allow for multiple types of uniforms not just mat4*/
+
 	//change the value of a uniform of a shader
 	setUniform(uni, val) {
 		gl.uniformMatrix4fv(this[uni], false, val);

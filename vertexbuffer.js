@@ -15,7 +15,7 @@ export class VertexBuffer {
 	
 	setData(offset, data) {
 		this.use();
-		gl.bufferSubData(gl.ARRAY_BUFFER, offset, new Float32Array(data));
+		gl.bufferSubData(gl.ARRAY_BUFFER, offset, data);
 	}
 	
 	remove() {
