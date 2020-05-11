@@ -62,7 +62,7 @@ setInterval(function() {
   var currentTime = (new Date()).getTime();
   var timeDifference = currentTime - lastUpdateTime;
 
-  player_mov.time_modification = timeDifference;
+  key_input.time_modification = timeDifference;
   socket.emit('key input', key_input);
 
   lastUpdateTime = currentTime;
@@ -71,26 +71,46 @@ setInterval(function() {
 
 /* TODO: Implement using webgl
          Implement drawing for other entities
-         ensure player movement is persistent across different devices
-         get rid of random lag jumps ... using the fucking interpolation method
-         better organize your code
+         change the implementation of the interpolation to preform all at once during drawing
+         to increase the efficiency of what the fuck ur doing
 */
 
-/* INTERPOLATION:
-1. have old data prestored in a specific dictionary to access
-2. get new pos from server
-3. have client draw movment of all sub frames that would appear between old and new pos
-   you might want it so sub frame position increase is not a fixed number and is instead a ratio
-4. DONE
-*/
 
-/*
-// store a temporary version of the data locally every transmission
+// store a temporary version of the data every time new player joins
+// should only be used as position reference
 var localData;
-socket.on('transmit', function(players) {
+socket.on('update local log', function(players) {
   localData = players;
 });
-*/
+
+// stores the data that was transmitted by the server
+var serverData;
+socket.on('transmit', function(players) {
+  serverData = players;
+});
+
+function moveTo(p_id) {
+  var difference_y = serverData[p_id].y_pos_player - localData[p_id].y_pos_player;
+  var difference_x = serverData[p_id].x_pos_player - localData[p_id].x_pos_player;
+
+  localData[p_id].y_pos_player += difference_y/10;
+  localData[p_id].x_pos_player += difference_x/10;
+      console.log(difference_x + ", " + difference_y);
+
+}
+
+// smoothy use the local data and transition the values to the new ones that were sent by server
+// this increments on a seperate timer than the drawing
+// probably would be more efficient to run a for loop to draw individual frames to prevent lag
+// next time fix that please, since code is modular you only need to change a few things
+setInterval(function() {
+  for (var id in localData) {
+    if ((localData[id].x_pos_player != serverData[id].x_pos_player) ||
+        (localData[id].y_pos_player != serverData[id].y_pos_player)) {
+      moveTo(id);
+    }
+  }
+}, 1000/ 500);
 
 
 //draw players (done for testing will be removed/modified in future)
@@ -99,13 +119,16 @@ canvas.width = 800;
 canvas.height = 600;
 var context = canvas.getContext('2d');
 // draw the player do something with transmitted data
-  socket.on('transmit', function(players) {
+setInterval(function() {
   context.clearRect(0, 0, 800, 600);
   context.fillStyle = 'green';
-  for (var id in players) {
-    var player = players[id];
+  for (var id in localData) {
+    var player = localData[id];
     context.beginPath();
     context.arc(player.x_pos_player, player.y_pos_player, 30, 0, 2 * Math.PI);
     context.fill();
+    //console.log("server: " +serverData[id].x_pos_player);
+    //console.log("local: " + localData[id].x_pos_player);
+
   }
-});
+}, 1000 / 60);

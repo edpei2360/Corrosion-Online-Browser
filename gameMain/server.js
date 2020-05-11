@@ -86,8 +86,6 @@ function setPlayerYPos(players, id, newVel) {
   }
 }
 
-
-
 // handles new players and movement
 io.on('connection', function(socket) {
 
@@ -100,6 +98,7 @@ io.on('connection', function(socket) {
       y_pos_player: 300,
       p_vel : 3
     };
+    io.sockets.emit('update local log', players);
   });
 
   // check the connect sockets id and effect its position
@@ -133,6 +132,6 @@ io.on('connection', function(socket) {
 // send the new player positions to all clients
 setInterval(function() {
   io.sockets.emit('transmit', players);
-}, 1000 / 120);
+}, 1000 / 60);
 
 
