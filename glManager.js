@@ -2,6 +2,7 @@ import {Shader} from '/shader.js'
 import {VertexArray} from '/vertexarray.js'
 import {vertexBufferSize, entitySize, vertexsPerEntity} from '/globals.js'
 import {ortho, idmat4} from "/math.js"
+import {TextureAtlas, generateSubTextures} from "/texture.js"
 
 export var gl;
 export var mainShader;
@@ -25,6 +26,7 @@ export function glInit() {
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
 	gl.clearDepth(1.0);                 // Clear everything
 	gl.enable(gl.DEPTH_TEST);           // Enable depth testing
+	
 	//enable transparency
 	gl.enable(gl.BLEND)
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -44,10 +46,7 @@ export function glInit() {
 	//init va
 	addVertexArray();
 	
-	//initTextures();
-	//startLoadingScreen();
-	
-	startDrawLoop();//tmp
+	startLoadingScreen();
 }
 
 class VertexArrayIndex {
@@ -130,10 +129,15 @@ function removeVertexArray() {
 	removed.remove();
 }
 
+//tmp
+	import {loaded} from "/main.js"
+//
 var drawLoop = null;
 function startDrawLoop() {
-	if (drawLoop != null) return;
+	if (drawLoop != null) throw "draw loop already running";
 	drawLoop = setInterval(draw, 0);
+	
+	loaded();//tmp
 }
 
 function endDrawLoop() {
@@ -142,18 +146,30 @@ function endDrawLoop() {
 	drawLoop = null;
 }
 
+var loadingLoop = null;
 function startLoadingScreen() {
-	throw "Not Implemented";
+	if (loadingLoop != null) throw "draw loop already running";
+	initTextures();
+	loadingLoop = setInterval(loadingScreenLoop, 0);
 }
 
 function stopLoadingScreen() {
-	throw "Not Implemented";
+	generateSubTextures();
+	clearInterval(loadingLoop);
+	startDrawLoop();
 }
 
 function loadingScreenLoop() {
-	throw "Not Implemented";
+	console.log("loading");//TODO actual loading page not spaming console
 }
 
+export var textureAtlases = [];
+var texturesToLoad = 1;
 function initTextures() {
-	throw "Not Implemented";
+	textureAtlases.push(new TextureAtlas("/test.png", textureLoaded));
+}
+
+export function textureLoaded() {
+	texturesToLoad--;
+	if (texturesToLoad == 0) stopLoadingScreen();
 }

@@ -1,6 +1,6 @@
 # version 300 es
 in lowp vec4 vertexColor;
-in mediump vec2 texCords;
+in highp vec2 texCords;
 flat in int texSlot;
 
 uniform sampler2D textures[32];

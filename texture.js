@@ -1,4 +1,4 @@
-import {gl, mainShader} from "/glManager.js"
+import {gl, mainShader, textureLoaded, textureAtlases} from "/glManager.js"
 
 class Texture {
 	constructor(slot, x, y, width, height) {
@@ -23,7 +23,7 @@ function getTexSlot() {
 }
 
 export class TextureAtlas {
-	constructor(imgURL, texPosURL) {
+	constructor(imgURL) {
 		this.loaded = false;
 		this.rendererID = gl.createTexture();
 		downloadImage(imgURL, this);
@@ -31,6 +31,9 @@ export class TextureAtlas {
 	
 	setImage(image){
 		this.texSlot = getTexSlot();
+		this.width = image.width;
+		this.height = image.height;
+		
 		gl.activeTexture(gl["TEXTURE" + this.texSlot]);
 		this.bind();
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, image.width, 
@@ -40,9 +43,13 @@ export class TextureAtlas {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-
-		gl.uniform1i(mainShader["textures" + this.texSlot], this.texSlot);//tmp TODO set uniform with shade need 1 int implementeation in shader
+		
+		//tmp TODO set uniform with shade need 1 int implementeation in shader
+			mainShader.use();
+			gl.uniform1i(mainShader["textures" + this.texSlot], this.texSlot); 
+		//
 		this.loaded = true;
+		textureLoaded();
 	}
 	
 	bind() {
@@ -51,6 +58,20 @@ export class TextureAtlas {
 	
 	getTexture(x, y, width, height) {
 		if (!this.loaded) throw "Image not loaded.";
-		return new Texture(this.texSlot, x, y, width, height); 
+		const multx = 0xffff/this.width;
+		const multy = 0xffff/this.height;
+		
+		return new Texture(this.texSlot, x*multx, y*multy, width*multx, height*multy); 
 	}
+}
+
+//tmp
+	export var texPoop;
+	export var texCircle;
+//
+export function generateSubTextures() {
+	//tmp
+		texPoop = textureAtlases[0].getTexture(0, 0, 256, 256);
+		texCircle = textureAtlases[0].getTexture(256, 0, 256, 256);
+	//
 }

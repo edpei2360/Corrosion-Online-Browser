@@ -1,8 +1,8 @@
+//shouldn't be used directly. should only be used by a vertex array
 import {vertexBufferSize} from "/globals.js"
 import {gl} from "/glManager.js"
 
 export class VertexBuffer {
-	static bound = -1;
 	constructor() {
 		this.rendererID = gl.createBuffer();
 		this.use();
