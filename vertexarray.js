@@ -40,6 +40,7 @@ export class VertexArray {
 		this.stride = 0;
 		this.vb = new VertexBuffer();
 		this.vertexCount = 0;
+		this.indexCount = 0;
 	}
 	
 	use() {
@@ -107,5 +108,17 @@ export class VertexArray {
 	
 	removeVertexs(amount) {
 		this.vertexCount -= amount;
+	}
+	
+	getIndexCount() {
+		return this.indexCount;
+	}
+	
+	addIndexs(amount) {
+		this.indexCount += amount;
+	}
+	
+	removeIndexs(amount) {
+		this.indexCount -= amount;
 	}
 }

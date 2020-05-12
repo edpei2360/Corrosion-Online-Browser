@@ -8,10 +8,7 @@ export class Entity {
 		//init data
 		var vertexs = [
 			//x    y    z    color texxy
-			-1.0, -1.0, 0.0, 0.0, 0.0,
 			-1.0,  1.0, 0.0, 0.0, 0.0,
-			 1.0,  1.0, 0.0, 0.0, 0.0,
-			 
 			 1.0,  1.0, 0.0, 0.0, 0.0,
 			 1.0, -1.0, 0.0, 0.0, 0.0,
 			-1.0, -1.0, 0.0, 0.0, 0.0];
@@ -37,27 +34,23 @@ export class Entity {
 		for (var i = 0; i < vertexsPerEntity; i++) {
 			data32[i*5 + 3] = tex.slot;
 		}
-		const data16 = new Uint16Array(this.vertexData.buffer);
 		
+		const data16 = new Uint16Array(this.vertexData.buffer);
 		//top left
-		data16[18] = tex.x;
-		data16[19] = tex.y;
+		data16[8] = tex.x;
+		data16[9] = tex.y;
 		
 		//top right
-		data16[28] = tex.x + tex.width;
-		data16[29] = tex.y;
-		data16[38] = tex.x + tex.width;
-		data16[39] = tex.y;
+		data16[18] = tex.x + tex.width;
+		data16[19] = tex.y;
 		
 		//bottom right
-		data16[48] = tex.x + tex.width;
-		data16[49] = tex.y + tex.height;
+		data16[28] = tex.x + tex.width;
+		data16[29] = tex.y + tex.height;
 		
 		//bottom left
-		data16[8] = tex.x;
-		data16[9] = tex.y + tex.height;
-		data16[58] = tex.x;
-		data16[59] = tex.y + tex.height;
+		data16[38] = tex.x;
+		data16[39] = tex.y + tex.height;
 	}
 	
 	setColor(r,g,b,a=255){

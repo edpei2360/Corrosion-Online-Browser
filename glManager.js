@@ -1,11 +1,13 @@
 import {Shader} from '/shader.js'
 import {VertexArray} from '/vertexarray.js'
-import {vertexBufferSize, entitySize, vertexsPerEntity} from '/globals.js'
+import {vertexBufferSize, entitySize, vertexsPerEntity, indexsPerEntity} from '/globals.js'
 import {ortho, idmat4} from "/math.js"
 import {TextureAtlas, generateSubTextures} from "/texture.js"
+import {ElementBuffer} from "/elementbuffer.js"
 
 export var gl;
 export var mainShader;
+export var mainEB;
 
 export function glInit() {
 	const canvas = document.querySelector("#glCanvas");
@@ -44,6 +46,7 @@ export function glInit() {
 	}
 	
 	//init va
+	initElementBuffer();
 	addVertexArray();
 	
 	startLoadingScreen();
@@ -66,7 +69,8 @@ export function getEntity(entity) {
 	const out = vertexArrayEnd;
 	//tell vertex array to draw another entity
 	vertexArrays[out.vertexArray].addVertexs(vertexsPerEntity);
-
+	vertexArrays[out.vertexArray].addIndexs(indexsPerEntity);
+	
 	//update end position
 	vertexArrayEnd = new VertexArrayIndex(out.vertexArray, out.offset+entitySize);
 	//check if new end position is out of bounds
@@ -108,7 +112,7 @@ function draw() {
 	//main drawing
 	for (var i = 0; i < vertexArrays.length; i++){
 		vertexArrays[i].use();
-		gl.drawArrays(gl.TRIANGLES, 0, vertexArrays[i].getVertexCount());
+		gl.drawElements(gl.TRIANGLES, vertexArrays[i].getIndexCount(), gl.UNSIGNED_SHORT, 0);
 	}
 }
 
@@ -120,6 +124,7 @@ function addVertexArray() {
 	va.addAttribute("aVertexColor", 1, gl.UNSIGNED_INT, true);
 	va.addAttribute("aVertexCords", 1, gl.UNSIGNED_INT, true);
 	va.setAttributes(mainShader);
+	mainEB.use();
 	vertexArrays.push(va);
 }
 
@@ -172,4 +177,8 @@ function initTextures() {
 export function textureLoaded() {
 	texturesToLoad--;
 	if (texturesToLoad == 0) stopLoadingScreen();
+}
+
+function initElementBuffer() {
+	mainEB = new ElementBuffer();
 }

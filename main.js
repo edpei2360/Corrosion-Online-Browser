@@ -1,22 +1,22 @@
 /*
  * TODO:
  * 	glManager removeEntity(entity)
- *  with shader/vertexarray have bit dedicated to selecting if the entity 
+ * 	with shader/vertexarray have bit dedicated to selecting if the entity 
  * 		is effected by the projection matrix or a static matrix
- * 	use element buffers to reduce repeated vertexs (saves 28 bytes per entity)
- * 		could reuse same eb to save even more
  * 	multiple types of uniforms
  * 
  * 	loading screen
  * 	
- * 	maths
+ * 	maths (web assembly?)
  * 	entity modeltransforms and stuff
  * 		scale, rotation, translation, center of object/pivot (for rotation)
  * 
  * 	error handling and callbacks
  * 
- * 	clean tmps
+ * 	clean tmps and genneral cleaning
  * 	move all gl stuff into own folder
+ * 	move functions/vars from glManager, globals to appropriate locations
+ * 	documentation :(
  * 	fix annoying warning "XMLHttpRequest on the main thread ..."
  */
 import {glInit, setCamera} from "/glManager.js"//tmp remove setCamera
@@ -38,6 +38,7 @@ function main() {
 			v2.setTexture(texPoop);
 			v2.translate(3,3);
 			v2.sendDataToGPU();
+			
 			
 			const v3 = new Entity();
 			v3.setColor(123,25,190);
