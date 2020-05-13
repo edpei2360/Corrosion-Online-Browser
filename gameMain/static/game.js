@@ -95,7 +95,16 @@ function moveTo(p_id) {
 
   localData[p_id].y_pos_player += difference_y/10;
   localData[p_id].x_pos_player += difference_x/10;
-      console.log(difference_x + ", " + difference_y);
+
+  // prevent the calculations going on forever
+  if(Math.abs(difference_y) < 0.5) {
+    localData[p_id].y_pos_player = serverData[p_id].y_pos_player
+  }
+  if(Math.abs(difference_x) < 0.5) {
+    localData[p_id].x_pos_player = serverData[p_id].x_pos_player
+  }
+
+  //console.log(difference_x + ", " + difference_y);
 
 }
 
