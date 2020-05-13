@@ -43,6 +43,7 @@ export class TextureAtlas {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		
 		//tmp TODO set uniform with shade need 1 int implementeation in shader
 			mainShader.use();
@@ -71,7 +72,7 @@ export class TextureAtlas {
 //
 export function generateSubTextures() {
 	//tmp
-		texPoop = textureAtlases[0].getTexture(0, 0, 256, 256);
+		texPoop = textureAtlases[0].getTexture(0, 0, 255, 256);
 		texCircle = textureAtlases[0].getTexture(256, 0, 256, 256);
 	//
 }

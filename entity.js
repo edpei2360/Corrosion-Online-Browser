@@ -1,18 +1,24 @@
 import {entitySize, vertexsPerEntity, vertexSize} from "/globals.js"
 import {getEntity, setData, removeEntity} from "/glManager.js"
+import {idmat3} from "/math.js"
+
+function defVertexs(scale = 1.0) {
+	return [
+		//x    y    z    color texxy
+		-scale,  scale, 0.0, 0.0, 0.0,
+		 scale,  scale, 0.0, 0.0, 0.0,
+		 scale, -scale, 0.0, 0.0, 0.0,
+		-scale, -scale, 0.0, 0.0, 0.0];
+}
 
 export class Entity {
 	constructor() {
 		getEntity(this);// sets this.vertexs and this.index
+		this.scale = 1.0;
+		this.x = this.y = this.z = 0.0;
 		
 		//init data
-		var vertexs = [
-			//x    y    z    color texxy
-			-1.0,  1.0, 0.0, 0.0, 0.0,
-			 1.0,  1.0, 0.0, 0.0, 0.0,
-			 1.0, -1.0, 0.0, 0.0, 0.0,
-			-1.0, -1.0, 0.0, 0.0, 0.0];
-		this.setVertexs(new Float32Array(vertexs));
+		this.setVertexs(new Float32Array(defVertexs(this.scale)));
 		this.sendDataToGPU();
 	}
 	
@@ -63,11 +69,99 @@ export class Entity {
 		}
 	}
 	
+	setZ(z) {
+		const data = new Float32Array(this.vertexData.buffer);
+		for (var i = 0; i < vertexsPerEntity; i++) {
+			data[i*5 + 2] = z;
+		}
+		this.z = z;
+	}
+	
 	translate(x,y) {
 		const data = new Float32Array(this.vertexData.buffer);
 		for (var i = 0; i < vertexsPerEntity; i++) {
 			data[i*5] += x;
 			data[i*5 + 1] += y;
 		}
+		this.x += x;
+		this.y += y;
+	}
+	
+	translateTo(x,y) {
+		const data = new Float32Array(this.vertexData.buffer);
+		
+		//top left
+		data[0] = -1.0 + x;
+		data[1] = 1.0 + y;
+		//top right
+		data[5] = 1.0 + x;
+		data[6] = 1.0 + y;
+		//bottom right
+		data[10] = 1.0 + x;
+		data[11] = -1.0 + y;
+		//bottom left
+		data[15] = -1.0 + x;
+		data[16] = -1.0 + y;
+		
+		this.x = x;
+		this.y = y;
+	}
+	
+	rotateRads(rads) {
+		throw "not implimented";
+	}
+	
+	rotateToRads(rads) {
+		const data = new Float32Array(this.vertexData.buffer);
+		const s = this.scale*Math.sin(rads);
+		const c = this.scale*Math.cos(rads);
+		//xpart = cos(r)*x + sin(r)*y
+		//ypart = -sin(r)*x + cos(r)*y
+		//top left
+		data[0] = s - c + this.x;
+		data[1] = s + c + this.y;
+		//top right
+		data[5] = c + s + this.x;
+		data[6] = c - s + this.y;
+		//bottom right
+		data[10] = c - s + this.x;
+		data[11] = this.y - s - c;
+		//bottom left
+		data[15] = this.x - c - s;
+		data[16] = s - c + this.y;
+	}
+
+	rotateVec(rads) {
+		throw "not implimented";
+	}
+	
+	rotateToVec(x, y) {
+		if (x == 0 && y == 0) throw "invalid vector";
+		const data = new Float32Array(this.vertexData.buffer);
+		const d = 1.0/Math.sqrt(x*x + y*y);
+		const c = this.scale*y*d;
+		const s = this.scale*x*d;
+		//xpart = cos(r)*x + sin(r)*y
+		//ypart = -sin(r)*x + cos(r)*y
+		//top left
+		data[0] = s - c + this.x;
+		data[1] = s + c + this.y;
+		//top right
+		data[5] = c + s + this.x;
+		data[6] = c - s + this.y;
+		//bottom right
+		data[10] = c - s + this.x;
+		data[11] = this.y - s - c;
+		//bottom left
+		data[15] = this.x - c - s;
+		data[16] = s - c + this.y;
+	}
+	
+	transformTo(mat3) {
+		throw "not implimented";
+	}
+	
+	transform(mat3) {
+		throw "not implimented";
 	}
 }

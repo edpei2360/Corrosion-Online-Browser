@@ -26,14 +26,13 @@ export function glInit() {
 
 	//gl settings
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
-	gl.clearDepth(1.0);                 // Clear everything
+	gl.clearDepth(0.0);                 // Clear everything
 	gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-	
+	gl.depthFunc(gl.GEQUAL);            // Near things obscure far things
+
 	//enable transparency
 	gl.enable(gl.BLEND)
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-	
-	gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
 
 	//compile main shader
 	mainShader = new Shader("/vs.glsl", "/fs.glsl");

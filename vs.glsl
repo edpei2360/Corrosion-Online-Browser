@@ -11,7 +11,7 @@ flat out int texSlot;
 void main() {
 	gl_Position = uProjectionMatrix * aVertexPosition;
 	if (aVertexColor < uint(32)) {
-		texCords = vec2(aVertexCords & uint(0xffff), aVertexCords >> 16) * (1.0/65536.0);
+		texCords = vec2(aVertexCords & uint(0xffff), aVertexCords >> 16) * (1.0/65535.0);
 		texSlot = int(aVertexColor);
 	} else {
 		vertexColor = vec4(

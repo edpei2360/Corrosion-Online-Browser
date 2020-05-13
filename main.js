@@ -4,12 +4,12 @@
  * 	with shader/vertexarray have bit dedicated to selecting if the entity 
  * 		is effected by the projection matrix or a static matrix
  * 	multiple types of uniforms
- * 
+ * 	transparent shader for colored transparent objects
  * 	loading screen
  * 	
  * 	maths (web assembly?)
  * 	entity modeltransforms and stuff
- * 		scale, rotation, translation, center of object/pivot (for rotation)
+ * 		scale, rotation, center of object/pivot (for rotation)
  * 
  * 	error handling and callbacks
  * 
@@ -32,11 +32,14 @@ function main() {
 			setCamera(0, 0);
 			const v = new Entity();
 			v.setTexture(texCircle);
+			v.rotateToVec(1,1);
+			v.setZ(0.5);
 			v.sendDataToGPU();
 			
 			const v2 = new Entity();
 			v2.setTexture(texPoop);
-			v2.translate(3,3);
+			v2.translateTo(3,3);
+			v2.rotateToRads(1.0471975512);
 			v2.sendDataToGPU();
 			
 			
