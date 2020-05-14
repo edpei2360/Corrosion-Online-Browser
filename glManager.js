@@ -1,7 +1,7 @@
 import {Shader} from '/shader.js'
 import {VertexArray} from '/vertexarray.js'
 import {vertexBufferSize, entitySize, vertexsPerEntity, indexsPerEntity} from '/globals.js'
-import {ortho, idmat4} from "/math.js"
+import {Mat4ortho} from "/math.js"
 import {TextureAtlas, generateSubTextures} from "/texture.js"
 import {ElementBuffer} from "/elementbuffer.js"
 
@@ -66,26 +66,46 @@ export function getEntity(entity) {
 	entity.index = entityArray.length;
 	entityArray.push(entity);
 	const out = vertexArrayEnd;
+	
 	//tell vertex array to draw another entity
 	vertexArrays[out.vertexArray].addVertexs(vertexsPerEntity);
 	vertexArrays[out.vertexArray].addIndexs(indexsPerEntity);
 	
 	//update end position
-	vertexArrayEnd = new VertexArrayIndex(out.vertexArray, out.offset+entitySize);
-	//check if new end position is out of bounds
-	if (vertexArrayEnd.offset >= vertexBufferSize) {
-		//create new vertex array and set new end
+	if (out.offset+entitySize >= vertexBufferSize) { //check if new end position is out of bounds
+		vertexArrayEnd = new VertexArrayIndex(out.vertexArray+1, 0);
 		addVertexArray();
-		vertexArrayEnd = new VertexArrayIndex(vertexArrayEnd.vertexArray+1, 0);
+	} else {
+		vertexArrayEnd = new VertexArrayIndex(out.vertexArray, out.offset+entitySize);
 	}
+	
+	//set end position of entity
 	entity.vertexs = out;
 }
 
-//swaps entity at the end with the entity being removed
-//then pops back
-//checks if vertexarray can be removed
 export function removeEntity(entity) {
-	throw "Not implimented";
+	//get last item
+	const back = entityArray.pop();
+	vertexArrays[back.vertexs.vertexArray].removeVertexs(vertexsPerEntity);
+	vertexArrays[back.vertexs.vertexArray].removeIndexs(indexsPerEntity);
+	
+	//update end position
+	vertexArrayEnd = new VertexArrayIndex(back.vertexs.vertexArray, back.vertexs.offset);
+	
+	if (back.index !== entity.index) {
+		//swap entity with last item
+		entityArray[entity.index] = back;
+		back.index = entity.index;
+		back.vertexs = entity.vertexs;
+		back.sendDataToGPU();
+	}
+	
+	//check if vertexarray can be removed
+	if (vertexArrays.length >= 2 
+		&& vertexArrays[vertexArrays.length-2].getIndexCount() == 0 
+		&& vertexArrays[vertexArrays.length-1].getIndexCount() == 0) {
+		removeVertexArray();
+	}
 }
 
 export function setData(vertexs, data) {
@@ -98,7 +118,7 @@ export function setData(vertexs, data) {
 //
 //sets the camera position
 export function setCamera(x, y) {
-	const projectionMatrix = ortho(x, y, width, height);
+	const projectionMatrix = Mat4ortho(x, y, width, height);
 	mainShader.use();
 	mainShader.setUniform("uProjectionMatrix", projectionMatrix);
 }
@@ -129,7 +149,7 @@ function addVertexArray() {
 
 //removes last vertexArrays
 function removeVertexArray() {
-	removed = vertexArrays.pop(va);
+	var removed = vertexArrays.pop();
 	removed.remove();
 }
 

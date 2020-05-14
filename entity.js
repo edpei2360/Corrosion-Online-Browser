@@ -1,24 +1,18 @@
 import {entitySize, vertexsPerEntity, vertexSize} from "/globals.js"
 import {getEntity, setData, removeEntity} from "/glManager.js"
-import {idmat3} from "/math.js"
-
-function defVertexs(scale = 1.0) {
-	return [
-		//x    y    z    color texxy
-		-scale,  scale, 0.0, 0.0, 0.0,
-		 scale,  scale, 0.0, 0.0, 0.0,
-		 scale, -scale, 0.0, 0.0, 0.0,
-		-scale, -scale, 0.0, 0.0, 0.0];
-}
+import {Vec2, transformVec2} from "/math.js"
 
 export class Entity {
-	constructor() {
+	constructor(scaleX = 1.0, scaleY = 1.0, offsetX = 0.0, offsetY = 0.0) {
 		getEntity(this);// sets this.vertexs and this.index
-		this.scale = 1.0;
-		this.x = this.y = this.z = 0.0;
+		this.scale = Vec2(scaleX, scaleY);
+		this.translation = Vec2();
+		this.trig = Vec2(0.0, 1.0); //[sin(rads), cos(rads)]
+		this.offset = Vec2(offsetX, offsetY);
 		
 		//init data
-		this.setVertexs(new Float32Array(defVertexs(this.scale)));
+		this.setVertexs(new Float32Array(20));
+		this.transform();
 		this.sendDataToGPU();
 	}
 	
@@ -77,91 +71,108 @@ export class Entity {
 		this.z = z;
 	}
 	
-	translate(x,y) {
-		const data = new Float32Array(this.vertexData.buffer);
-		for (var i = 0; i < vertexsPerEntity; i++) {
-			data[i*5] += x;
-			data[i*5 + 1] += y;
-		}
-		this.x += x;
-		this.y += y;
+	setScale(scaleX = 1.0, scaleY = 1.0) {
+		this.scale[0] = scaleX;
+		this.scale[1] = scaleY;
+		this.transform();
 	}
 	
-	translateTo(x,y) {
+	setOffset(setOffsetX = 0.0, setOffsetY = 0.0) {
+		this.offset[0] = setOffsetX;
+		this.offset[1] = setOffsetY;
+		this.transform();
+	}
+	
+	translate(x, y) {
 		const data = new Float32Array(this.vertexData.buffer);
-		
-		//top left
-		data[0] = -1.0 + x;
-		data[1] = 1.0 + y;
 		//top right
-		data[5] = 1.0 + x;
-		data[6] = 1.0 + y;
+		data[0] += x;
+		data[1] += y;
+		//top right
+		data[5] += x;
+		data[6] += y;
 		//bottom right
-		data[10] = 1.0 + x;
-		data[11] = -1.0 + y;
+		data[10] += x;
+		data[11] += y;
 		//bottom left
-		data[15] = -1.0 + x;
-		data[16] = -1.0 + y;
-		
-		this.x = x;
-		this.y = y;
+		data[15] += x;
+		data[16] += y;
+		this.translation[0] += x;
+		this.translation[1] += y;
+	}
+	
+	translateTo(x, y) {
+		const data = new Float32Array(this.vertexData.buffer);
+		const oldx = this.translation[0];
+		const oldy = this.translation[1];
+		//top right
+		data[0] += x - oldx;
+		data[1] += y - oldy;
+		//top right
+		data[5] += x - oldx;
+		data[6] += y - oldy;
+		//bottom right
+		data[10] += x - oldx;
+		data[11] += y - oldy;
+		//bottom left
+		data[15] += x - oldx;
+		data[16] += y - oldy;
+		this.translation[0] = x;
+		this.translation[1] = y;
 	}
 	
 	rotateRads(rads) {
-		throw "not implimented";
+		const s = Math.sin(rads);
+		const c = Math.cos(rads);
+		const tmp0 = this.trig[0]*c + this.trig[1]*s;
+		const tmp1 = this.trig[1]*c - this.trig[0]*s;
+		this.trig[0] = tmp0;
+		this.trig[1] = tmp1;
+		this.transform();
 	}
 	
 	rotateToRads(rads) {
-		const data = new Float32Array(this.vertexData.buffer);
-		const s = this.scale*Math.sin(rads);
-		const c = this.scale*Math.cos(rads);
-		//xpart = cos(r)*x + sin(r)*y
-		//ypart = -sin(r)*x + cos(r)*y
-		//top left
-		data[0] = s - c + this.x;
-		data[1] = s + c + this.y;
-		//top right
-		data[5] = c + s + this.x;
-		data[6] = c - s + this.y;
-		//bottom right
-		data[10] = c - s + this.x;
-		data[11] = this.y - s - c;
-		//bottom left
-		data[15] = this.x - c - s;
-		data[16] = s - c + this.y;
-	}
-
-	rotateVec(rads) {
-		throw "not implimented";
+		this.trig[0] = Math.sin(rads);
+		this.trig[1] = Math.cos(rads);
+		this.transform();
 	}
 	
 	rotateToVec(x, y) {
-		if (x == 0 && y == 0) throw "invalid vector";
+		const h = Math.sqrt(x*x + y*y);
+		this.trig[0] = y/h;
+		this.trig[1] = x/h;
+		this.transform();
+	}
+	
+	rotateVec(x, y) {
+		const h = Math.sqrt(x*x + y*y);
+		const s = y/h;
+		const c = x/h;
+		this.trig = Vec2(this.trig[0]*c + this.trig[1]*s, this.trig[1]*c - this.trig[0]*s);
+		this.transform();
+	}
+	
+	transform() {
 		const data = new Float32Array(this.vertexData.buffer);
-		const d = 1.0/Math.sqrt(x*x + y*y);
-		const c = this.scale*y*d;
-		const s = this.scale*x*d;
-		//xpart = cos(r)*x + sin(r)*y
-		//ypart = -sin(r)*x + cos(r)*y
 		//top left
-		data[0] = s - c + this.x;
-		data[1] = s + c + this.y;
+		var v = Vec2(-1.0, 1.0);
+		transformVec2(v, this.translation, this.trig, this.scale, this.offset);
+		data[0] = v[0];
+		data[1] = v[1];
 		//top right
-		data[5] = c + s + this.x;
-		data[6] = c - s + this.y;
+		v = Vec2(1.0, 1.0);
+		transformVec2(v, this.translation, this.trig, this.scale, this.offset);
+		data[5] = v[0];
+		data[6] = v[1];
 		//bottom right
-		data[10] = c - s + this.x;
-		data[11] = this.y - s - c;
+		v = Vec2(1.0, -1.0);
+		transformVec2(v, this.translation, this.trig, this.scale, this.offset);
+		data[10] = v[0];
+		data[11] = v[1];
 		//bottom left
-		data[15] = this.x - c - s;
-		data[16] = s - c + this.y;
-	}
-	
-	transformTo(mat3) {
-		throw "not implimented";
-	}
-	
-	transform(mat3) {
-		throw "not implimented";
+		v = Vec2(-1.0, -1.0);
+		transformVec2(v, this.translation, this.trig, this.scale, this.offset);
+		data[15] = v[0];
+		data[16] = v[1];
 	}
 }

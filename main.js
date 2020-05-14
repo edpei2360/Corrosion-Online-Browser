@@ -1,15 +1,14 @@
 /*
  * TODO:
- * 	glManager removeEntity(entity)
  * 	with shader/vertexarray have bit dedicated to selecting if the entity 
  * 		is effected by the projection matrix or a static matrix
  * 	multiple types of uniforms
- * 	transparent shader for colored transparent objects
+ * 	support for semitransparent objects
  * 	loading screen
- * 	
- * 	maths (web assembly?)
- * 	entity modeltransforms and stuff
- * 		scale, rotation, center of object/pivot (for rotation)
+ * 
+ * 	transforms
+ * 		optimize Entity.transform, math.transformVec2
+ * 		add trasformations that dont update entity immediately
  * 
  * 	error handling and callbacks
  * 
@@ -27,27 +26,49 @@ function main() {
 	glInit();
 }
 
-//tmp
-	export function loaded() {
-			setCamera(0, 0);
-			const v = new Entity();
-			v.setTexture(texCircle);
-			v.rotateToVec(1,1);
-			v.setZ(0.5);
-			v.sendDataToGPU();
-			
-			const v2 = new Entity();
-			v2.setTexture(texPoop);
-			v2.translateTo(3,3);
-			v2.rotateToRads(1.0471975512);
-			v2.sendDataToGPU();
-			
-			
-			const v3 = new Entity();
-			v3.setColor(123,25,190);
-			v3.translate(-3,3);
-			v3.sendDataToGPU();
-	}
+//test/example (you can delete)
+	var v3;
 //
+export function loaded() {
+	//test test/example (you can delete)
+		setCamera(0, 0);
+		const v = new Entity(2.0, 2.0);
+		v.setTexture(texCircle);
+		v.rotateToVec(4, 3);
+		v.rotateVec(4, 3);
+		v.setZ(0.5);
+		v.sendDataToGPU();
+		
+		const v2 = new Entity(5.0,5.0);
+		v2.setTexture(texPoop);
+		v2.translateTo(3,3);
+		v2.rotateToRads(3.14159265/8);
+		v2.rotateRads(3.14159265/8);
+		v2.sendDataToGPU();
+		
+		v3 = new Entity(2.0,2.0);
+		v3.setColor(123,25,190);
+		v3.translateTo(-3,3);
+		v3.translate(1.5,0);
+		v3.setZ(1.0);
+		v3.sendDataToGPU();
+	//
+	
+	told = performance.now();
+	setInterval(loop, 1000/60); //60 times a second could go full speed but idk
+}
+
+
+var told;
+function loop() {
+	const tnow = performance.now();
+	const t = tnow - told;
+	told = tnow;
+	
+	//test test/example (you can delete)
+		v3.rotateRads(t/1000);
+		v3.sendDataToGPU();
+	//
+}
 
 window.onload = main;
