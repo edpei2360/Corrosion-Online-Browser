@@ -1,12 +1,12 @@
 //shouldn't be used directly. should only be used by a vertex array
-import {vertexBufferSize} from "/globals.js"
-import {gl} from "/glManager.js"
+import {ENTITY_SIZE_8, ENTITIES_PER_BUFFER, VERTEX_BUFFER_SIZE} from "./global.js"
+import {gl} from "./glManager.js"
 
 export class VertexBuffer {
 	constructor() {
 		this.rendererID = gl.createBuffer();
 		this.use();
-		gl.bufferData(gl.ARRAY_BUFFER, vertexBufferSize, gl.DYNAMIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, VERTEX_BUFFER_SIZE, gl.DYNAMIC_DRAW);
 	}
 	
 	use() {

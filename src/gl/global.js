@@ -1,0 +1,10 @@
+export const VERTEX_SIZE_8 = 2*4 + 2*2 + 4 + 2*2; //2 floats, 2 shorts, 4 bytes, 2 shorts
+export const VERTEX_SIZE_16 = Math.floor(VERTEX_SIZE_8/2);
+export const VERTEX_SIZE_32 = Math.floor(VERTEX_SIZE_8/4);
+export const VERTEXS_PER_ENTITY = 4;
+export const ENTITY_SIZE_8 = VERTEX_SIZE_8 * VERTEXS_PER_ENTITY;
+export const ENTITY_SIZE_16 = VERTEX_SIZE_16 * VERTEXS_PER_ENTITY;
+export const ENTITY_SIZE_32 = VERTEX_SIZE_32 * VERTEXS_PER_ENTITY;
+export const ENTITIES_PER_BUFFER = 1000;
+export const INDEXS_PER_ENTITY = 6;
+export const VERTEX_BUFFER_SIZE = ENTITY_SIZE_8*ENTITIES_PER_BUFFER;

@@ -1,4 +1,24 @@
-import {gl} from "/glManager.js"
+import {gl} from "./glManager.js"
+import {Mat4ortho} from "../math.js"
+
+export var mainShader;
+export function initMainShader() {
+	mainShader = new Shader("/src/shaders/mainShader/vs.glsl", "/src/shaders/mainShader/fs.glsl");
+	mainShader.addAttribute("aVertexPosition");
+	mainShader.addAttribute("aZ");
+	mainShader.addAttribute("aData");
+	mainShader.addAttribute("aTexSlot");
+	mainShader.addAttribute("aVertexColor");
+	mainShader.addAttribute("aTextureCords");
+	mainShader.addUniform("uProjectionMatrix");
+	mainShader.addUniform("uStaticMatrix");
+	for (var i = 0; i < 32; i++) {
+		mainShader.addUniform("uTextures[" + i + "]");
+	}
+	
+	//set uStaticMatrix
+	mainShader.setUniformMat4("uStaticMatrix", Mat4ortho(0, 0, 640, 480));
+}
 
 //gets shader source code
 function loadFile(filePath) {
@@ -66,7 +86,13 @@ export class Shader {
 	}
 
 	//change the value of a uniform of a shader
-	setUniform(uni, val) {
+	setUniformMat4(uni, val) {
+		this.use();
 		gl.uniformMatrix4fv(this[uni], false, val);
+	}
+	
+	setUniformUInt(uni, val) {
+		this.use();
+		gl.uniform1i(this[uni], this.texSlot); 
 	}
 }

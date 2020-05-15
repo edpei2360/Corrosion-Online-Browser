@@ -1,4 +1,29 @@
-import {gl, mainShader, textureLoaded, textureAtlases} from "/glManager.js"
+import {gl} from "./glManager.js"
+import {mainShader} from "./shader.js"
+import {stopLoading} from "./loading.js"
+
+export var textureAtlases = [];
+
+export function initTextures() {
+	textureAtlases.push(new TextureAtlas("/res/test.png", textureLoaded));
+}
+
+var texturesToLoad = 1;
+export function textureLoaded() {
+	texturesToLoad--;
+	if (texturesToLoad == 0) stopLoading();
+}
+
+//tmp
+	export var texPoop;
+	export var texCircle;
+//
+export function generateSubTextures() {
+	//tmp
+		texPoop = textureAtlases[0].getTexture(0, 0, 255, 256);
+		texCircle = textureAtlases[0].getTexture(256, 0, 256, 256);
+	//
+}
 
 class Texture {
 	constructor(slot, x, y, width, height) {
@@ -42,13 +67,11 @@ export class TextureAtlas {
 		//TODO find best settings
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //gl.NEAREST ???
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); //gl.NEAREST ???
 		
-		//tmp TODO set uniform with shade need 1 int implementeation in shader
-			mainShader.use();
-			gl.uniform1i(mainShader["textures" + this.texSlot], this.texSlot); 
-		//
+		mainShader.setUniformUInt("textures" + this.texSlot, this.texSlot);
+		
 		this.loaded = true;
 		textureLoaded();
 	}
@@ -64,15 +87,4 @@ export class TextureAtlas {
 		
 		return new Texture(this.texSlot, x*multx, y*multy, width*multx, height*multy); 
 	}
-}
-
-//tmp
-	export var texPoop;
-	export var texCircle;
-//
-export function generateSubTextures() {
-	//tmp
-		texPoop = textureAtlases[0].getTexture(0, 0, 255, 256);
-		texCircle = textureAtlases[0].getTexture(256, 0, 256, 256);
-	//
 }

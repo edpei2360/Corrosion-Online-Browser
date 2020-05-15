@@ -11,7 +11,6 @@
  * 2 5 8
  * */
 
-//returns mat4
 export function Mat4ortho(x, y, width, height) {
 		const out = new Float32Array(16);
 		const lr = 2 / width;
