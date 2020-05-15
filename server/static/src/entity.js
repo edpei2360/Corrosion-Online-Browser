@@ -8,12 +8,15 @@ import {ENTITY_SIZE_8, VERTEXS_PER_ENTITY, VERTEX_SIZE_8, VERTEX_SIZE_16} from "
  * 		add trasformations that dont update entity immediately 
  */
 
+//contains all entities
 export const entityArray = [];
 
-//Flags
+//Clear Flag (use &= to apply)
 const CLEAR_COLOR_FLAG = 0x7f;
-const SET_COLOR_FLAG = 0x80;
 const CLEAR_STATIC_MATRIX_FLAG = 0xbf;
+
+//Set Flag (use |= to apply)
+const SET_COLOR_FLAG = 0x80;
 const SET_STATIC_MATRIX_FLAG = 0x40;
 
 //Vertex Offsets
@@ -55,6 +58,29 @@ const Y = 1;
 const SIN = 0;
 const COS = 1;
 
+
+/*
+ * class Entity
+ * 	int index: The index of this Entity in entityArray
+ * 	vertexs: Stores which vertexarray and at what offset this entity is 
+ * 		stored on the GPU.
+ * 	Vec2 scale: Scale of x and y of the Entity. Negative values mirror the Entity.
+ * 		default scale = [1.0, 1.0]
+ * 	Vec2 translation: The current position of the center of the Entity.
+ * 	Vec2 trig: Contains [sin(rads), cos[rads]] where rads is the current 
+ * 		rotation in radians of the Entity
+ * 	Vec2 offset: Moves the point of rotation/scale of the entity.
+ * 		By default it is in the center of the square.
+ * 		positive offset move the point of rotation/scale right and up, negative down and left
+ * 		default offset = [0.0, 0.0]
+ * 	int z: The z position of the Entity. Higher get drawn on top.
+ * 		z should be in inclusive range(0, 65535)
+ * 		default  z = 0
+ * 	UInt8Array vertexData: Buffer of most up to date vertex data.
+ * 
+ * NOTES:
+ * 	e.remove() must be called to actually stop the entity from being drawn.
+ */
 export class Entity {
 	constructor(scaleX = 1.0, scaleY = 1.0, offsetX = 0.0, offsetY = 0.0) {
 		getEntity(this);// sets this.vertexs and this.index
@@ -62,7 +88,7 @@ export class Entity {
 		this.translation = Vec2();
 		this.trig = Vec2(0.0, 1.0); //[sin(rads), cos(rads)]
 		this.offset = Vec2(offsetX, offsetY);
-		this.z = 0.0;
+		this.z = 0;
 		
 		//init data
 		this.setVertexs(new Uint8Array(ENTITY_SIZE_8));
@@ -70,19 +96,43 @@ export class Entity {
 		this.sendDataToGPU();
 	}
 	
+	/*
+	 * Sets the vertexs of the entity by given data.
+	 * ArrayBuffer data: data change vertexs to.
+	 * 
+	 * data.byteLength == ENTITY_SIZE_8 
+	 * otherwise throws: Data not proper len
+	 * 
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	setVertexs(data) {
-		if (data.byteLength != ENTITY_SIZE_8) throw "Data not proper len:" + data.byteLength + " != " + ENTITY_SIZE_8;
+		if (data.byteLength != ENTITY_SIZE_8) {
+			throw "Data not proper len:" + data.byteLength + " != " + ENTITY_SIZE_8;
+		}
 		this.vertexData = new Uint8Array(data.buffer);
 	}
 	
+	/*
+	 * Send vertex data to the vertexArray for further processing
+	 */
 	sendDataToGPU() {
 		setData(this.vertexs, this.vertexData);
 	}
 	
+	/*
+	 * Removes the entity.
+	 */
 	remove() {
 		removeEntity(this);
 	}
 	
+	
+	/*
+	 * Sets the current texture of the entity.
+	 * Texture tex: the texture to set.
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 * NOTE: Removes the current color.
+	 */
 	setTexture(tex) {
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_DATA] &= CLEAR_COLOR_FLAG;
@@ -107,6 +157,17 @@ export class Entity {
 		data16[OFFSET_BOTTOM_LEFT_TEX_Y] = tex.y + tex.height;
 	}
 	
+	/*
+	 * Sets the current color of the entity.
+	 * int r: The red value of the color.
+	 * 		r should be in inclusive range(0, 255)
+	 * int g: The green value of the color.
+	 * 		g should be in inclusive range(0, 255)
+	 * int b: The blue value of the color.
+	 * 		b should be in inclusive range(0, 255)
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 * NOTE: remove current texture
+	 */
 	setColor(r,g,b){
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_DATA] |= SET_COLOR_FLAG;
@@ -117,18 +178,36 @@ export class Entity {
 		}
 	}
 	
+	/*
+	 * Makes it so the entity is not effectied by the ProjectionMatrix and 
+	 * 		instead by the StaticMatrix. (not effected by moveCamera/setCamera)
+	 * NOTE: Entitiy are by default Dynamic not Static.
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	setStatic() {
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_DATA] |= SET_STATIC_MATRIX_FLAG;
 		}
 	}
 	
+	/*
+	 * Makes it so the entity is effectied by the ProjectionMatrix and 
+	 * 		not by the StaticMatrix. (effected by moveCamera/setCamera)
+	 * NOTE: Entitiy are by default Dynamic.
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	setDynamic() {
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_DATA] &= CLEAR_STATIC_MATRIX_FLAG;
 		}
 	}
 	
+	/*
+	 * Sets the Z position of the entity. Higher Z's get drawn on top.
+	 * int z: The Z value to set.
+	 * 		z value should be in the inclusive range(0, 65535)
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	setZ(z) {
 		const data = new Uint16Array(this.vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
@@ -136,19 +215,45 @@ export class Entity {
 		}
 		this.z = z;
 	}
-	
+
+	/*
+	 * Sets the scale
+	 * float scaleX: Scales the x componet of the entity
+	 * 		default scaleX = 1.0
+	 * float scaleY: Scales the y componet of the entity
+	 * 		default scaleY = 1.0
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	setScale(scaleX = 1.0, scaleY = 1.0) {
 		this.scale[X] = scaleX;
 		this.scale[Y] = scaleY;
 		this.transform();
 	}
 	
+	/*
+	 * Moves the point of rotation/scale of the entity.
+	 * By default it is in the center of the square. 
+	 * positive offset move the point of rotation/scale right and up, negative down and left
+	 * 
+	 * float offsetX: Sets the offset x value
+	 * 		default offsetX = 0.0
+	 * float offsetY: Sets the offset y value
+	 * 		default offsetY = 0.0
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	setOffset(setOffsetX = 0.0, setOffsetY = 0.0) {
 		this.offset[X] = setOffsetX;
 		this.offset[Y] = setOffsetY;
 		this.transform();
 	}
 	
+	/*
+	 * Moves the entity by the given vector.
+	 * 
+	 * float x: x value to tranlate
+	 * float y: y value to tranlate
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	translate(x, y) {
 		const data = new Float32Array(this.vertexData.buffer);
 		//top right
@@ -167,7 +272,13 @@ export class Entity {
 		this.translation[Y] += y;
 	}
 	
-	
+	/*
+	 * Moves the entity to the given vector.
+	 * 
+	 * float x: x value to tranlate to
+	 * float y: y value to tranlate to
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	translateTo(x, y) {
 		const data = new Float32Array(this.vertexData.buffer);
 		x -= this.translation[X];
@@ -188,6 +299,12 @@ export class Entity {
 		this.translation[Y] = y;
 	}
 	
+	/*
+	 * Rotates the entity by a given angle.
+	 * 
+	 * float rads: angle in radians to rotate
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	rotateRads(rads) {
 		const s = Math.sin(rads);
 		const c = Math.cos(rads);
@@ -197,13 +314,25 @@ export class Entity {
 		this.trig[COS] = tmp1;
 		this.transform();
 	}
-	
+
+	/*
+	 * Rotates the entity to a given angle.
+	 * 
+	 * float rads: angle in radians to rotate
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	rotateToRads(rads) {
 		this.trig[SIN] = Math.sin(rads);
 		this.trig[COS] = Math.cos(rads);
 		this.transform();
 	}
 	
+	/*
+	 * Rotates the entity to a given vector.
+	 * 	(1,0) rotates to (x,y) (does not strech)
+	 * float rads: angle in radians to rotate to
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	rotateToVec(x, y) {
 		const h = Math.sqrt(x*x + y*y);
 		this.trig[SIN] = y/h;
@@ -211,6 +340,12 @@ export class Entity {
 		this.transform();
 	}
 	
+	/*
+	 * Rotates the entity by a given vector.
+	 * 	the curretn (1,0) rotates to (x,y) (does not strech)
+	 * float rads: angle in radians to rotate
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 */
 	rotateVec(x, y) {
 		const h = Math.sqrt(x*x + y*y);
 		const s = y/h;
@@ -222,6 +357,11 @@ export class Entity {
 		this.transform();
 	}
 	
+	/*
+	 * Applies a transformation from the currently set info (translation, trig/angle, scale, offset)
+	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
+	 * NOTE: this should not be needed to be called outside of the Entity class.
+	 */
 	transform() {
 		const data = new Float32Array(this.vertexData.buffer);
 		//top left

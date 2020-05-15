@@ -14,15 +14,13 @@ function draw() {
 	}
 }
 
-//tmp
-	import {loaded} from "../main.js"
-//
+import {loaded} from "../main.js"
 var drawLoop = null;
 export function startDrawLoop() {
 	if (drawLoop != null) throw "draw loop already running";
 	drawLoop = setInterval(draw, 0);
 	
-	loaded();//tmp
+	loaded();
 }
 
 export function endDrawLoop() {

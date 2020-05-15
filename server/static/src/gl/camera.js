@@ -6,6 +6,7 @@ import {mainShader} from "./shader.js"
 	const height = 18;
 //
 const cameraPos = new Float32Array(2);
+
 //sets the camera position
 export function setCamera(x, y) {
 	cameraPos[0] = x;
