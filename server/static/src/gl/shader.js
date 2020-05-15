@@ -3,7 +3,7 @@ import {Mat4ortho} from "../math.js"
 
 export var mainShader;
 export function initMainShader() {
-	mainShader = new Shader("/src/shaders/mainShader/vs.glsl", "/src/shaders/mainShader/fs.glsl");
+	mainShader = new Shader("/static/src/shaders/mainShader/vs.glsl", "/static/src/shaders/mainShader/fs.glsl");
 	mainShader.addAttribute("aVertexPosition");
 	mainShader.addAttribute("aZ");
 	mainShader.addAttribute("aData");

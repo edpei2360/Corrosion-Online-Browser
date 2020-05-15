@@ -1,17 +1,11 @@
 <html>
   <head>
     <title>Corrosion 2.0</title>
-    <style>
-      canvas {
-        width: 800px;
-        height: 600px;
-        border: 5px solid black;
-      }
-    </style>
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <script type="module" src="/static/src/main.js"></script> 
+    <canvas id="glCanvas" width="640" height="480"></canvas>
   </body>
   <script src="/static/client.js"></script>
   <script src="/static/keyinput.js"></script>

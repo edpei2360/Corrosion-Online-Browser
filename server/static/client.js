@@ -25,6 +25,7 @@ socket.on('transmit', function(players) {
   serverData = players;
 });
 
+/*
 //draw players (done for testing will be removed/modified in future)
 var canvas = document.getElementById('canvas');
 canvas.width = 800;
@@ -44,3 +45,4 @@ setInterval(function() {
 
   }
 }, 1000 / 60);
+*/

@@ -5,7 +5,7 @@ import {stopLoading} from "./loading.js"
 export var textureAtlases = [];
 
 export function initTextures() {
-	textureAtlases.push(new TextureAtlas("/res/test.png", textureLoaded));
+	textureAtlases.push(new TextureAtlas("/static/res/test.png", textureLoaded));
 }
 
 var texturesToLoad = 1;
