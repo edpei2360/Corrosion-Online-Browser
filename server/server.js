@@ -28,12 +28,15 @@ io.on('connection', function(socket) {
 
     socket.on('disconnect', function () {
       delete players[socket.id]
+      io.sockets.emit('remove player', socket.id);
         console.log('A user disconnected');
     });
 });
 
 /* TODO: add any new variables that need to be sent
          make it so that server only forwards data
+         make it so the functions in the io.on and server.listen are their own thing
+         make it so client does calculations
 */
 
 
@@ -98,7 +101,7 @@ io.on('connection', function(socket) {
       y_pos_player: 300,
       p_vel : 3
     };
-    io.sockets.emit('update local log', players);
+    io.sockets.emit('update local log', players, socket.id);
   });
 
   // check the connect sockets id and effect its position

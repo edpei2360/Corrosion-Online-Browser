@@ -24,28 +24,31 @@ function main() {
 	//tell server new player has connected
 	socket.emit('new player');
 
+	//moved here because shaders take to long to load and result in no data sent
+	// store a temporary version of the data every time new player joins
+	// should only be used as position reference
+	socket.on('update local log', function(players, id) {
+	  localData = players;
+		console.log("fuck you cunt");
+		entitiesDict[id] = new Entity();
+		//console.log("asdjiasidojsadoiisdjoasijdaoisjdoij");
+	});
+
 }
 
-var players = [];
+var entitiesDict = {};
 var localData;
 var serverData;
 export function loaded() {
 	setCamera(0, 0);
 
-	// test drawing thing
-	players.push(new Entity());
-	players[0].setTexture(texPoop);
-	players[0].translateTo(1,1);
-	players[0].sendDataToGPU();
-
 	//code to run once textures, shaders, rest of webgl stuff has finished loading
 
 	//
 
-	// store a temporary version of the data every time new player joins
-	// should only be used as position reference
-	socket.on('update local log', function(players) {
-	  localData = players;
+	socket.on('remove player', function(data) {
+		delete localData[data];
+		delete entitiesDict[data];
 	});
 
 	// stores the data that was transmitted by the server
@@ -62,8 +65,8 @@ function moveTo(p_id) {
   var difference_y = serverData[p_id].y_pos_player - localData[p_id].y_pos_player;
   var difference_x = serverData[p_id].x_pos_player - localData[p_id].x_pos_player;
 
-  localData[p_id].y_pos_player += difference_y/10;
-  localData[p_id].x_pos_player += difference_x/10;
+  localData[p_id].y_pos_player += difference_y/5;
+  localData[p_id].x_pos_player += difference_x/5;
 
   // prevent the calculations going on forever
   if(Math.abs(difference_y) < 0.5) {
@@ -83,6 +86,17 @@ function loop() {
 	//game logic loop (runs 60 times a second)
 
 	//
+
+	// draw all entities
+	for (var id in entitiesDict) {
+    var ent = entitiesDict[id];
+
+		ent.setTexture(texPoop);
+		// IDK how this works still
+		ent.translateTo(localData[id].x_pos_player/1000,localData[id].y_pos_player/1000);
+		ent.sendDataToGPU();
+		//console.log("asjdoiasdoij");
+  }
 
   key_input.time_modification = t;
 	socket.emit('key input', key_input);
