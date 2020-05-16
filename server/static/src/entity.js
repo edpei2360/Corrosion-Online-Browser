@@ -12,19 +12,18 @@ import {ENTITY_SIZE_8, VERTEXS_PER_ENTITY, VERTEX_SIZE_8, VERTEX_SIZE_16} from "
 export const entityArray = [];
 
 //Clear Flag (use &= to apply)
-const CLEAR_COLOR_FLAG = 0x7f;
-const CLEAR_STATIC_MATRIX_FLAG = 0xbf;
+const CLEAR_COLOR_FLAG = 0xfffe;
+const CLEAR_STATIC_MATRIX_FLAG = 0xfffd;
 
 //Set Flag (use |= to apply)
-const SET_COLOR_FLAG = 0x80;
-const SET_STATIC_MATRIX_FLAG = 0x40;
+const SET_COLOR_FLAG = 0x01;
+const SET_STATIC_MATRIX_FLAG = 0x02;
 
 //Vertex Offsets
 const OFFSET_X = 0; //use Float32Array
 const OFFSET_Y = 1; //use Float32Array
 const OFFSET_Z = 4; //use Uint16Array
-const OFFSET_DATA = 10; //use Uint8Array
-const OFFSET_TEX_SLOT = 11; //use Uint8Array
+const OFFSET_DATA = 5; //use Uint16Array
 const OFFSET_R = 12; //use Uint8Array
 const OFFSET_G = 13; //use Uint8Array
 const OFFSET_B = 14; //use Uint8Array
@@ -134,12 +133,12 @@ export class Entity {
 	 * NOTE: Removes the current color.
 	 */
 	setTexture(tex) {
+		const data16 = new Uint16Array(this.vertexData.buffer);
+
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_DATA] &= CLEAR_COLOR_FLAG;
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_TEX_SLOT] = tex.slot;
+			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] &= CLEAR_COLOR_FLAG;
 		}
 
-		const data16 = new Uint16Array(this.vertexData.buffer);
 		//top left
 		data16[OFFSET_TOP_LEFT_TEX_X] = tex.x;
 		data16[OFFSET_TOP_LEFT_TEX_Y] = tex.y;
@@ -169,8 +168,9 @@ export class Entity {
 	 * NOTE: remove current texture
 	 */
 	setColor(r,g,b){
+		const data16 = new Uint16Array(this.vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_DATA] |= SET_COLOR_FLAG;
+			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] |= SET_COLOR_FLAG;
 			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_R] = r;
 			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_G] = g;
 			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_B] = b;
@@ -185,8 +185,9 @@ export class Entity {
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	setStatic() {
+		const data16 = new Uint16Array(this.vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_DATA] |= SET_STATIC_MATRIX_FLAG;
+			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] |= SET_STATIC_MATRIX_FLAG;
 		}
 	}
 
@@ -197,8 +198,9 @@ export class Entity {
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	setDynamic() {
+		const data16 = new Uint16Array(this.vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_DATA] &= CLEAR_STATIC_MATRIX_FLAG;
+			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] &= CLEAR_STATIC_MATRIX_FLAG;
 		}
 	}
 

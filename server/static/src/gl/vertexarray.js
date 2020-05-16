@@ -29,8 +29,7 @@ function addVertexArray() {
 	
 	va.addAttribute("aVertexPosition", 2, gl.FLOAT);
 	va.addAttribute("aZ", 1, gl.UNSIGNED_SHORT, false, true);//normalized?
-	va.addAttribute("aData", 1, gl.UNSIGNED_BYTE, true);
-	va.addAttribute("aTexSlot", 1, gl.UNSIGNED_BYTE, true);
+	va.addAttribute("aData", 1, gl.UNSIGNED_SHORT, true);
 	va.addAttribute("aVertexColor", 4, gl.UNSIGNED_BYTE, false, true);
 	va.addAttribute("aTextureCords", 2, gl.UNSIGNED_SHORT, false, true);
 	

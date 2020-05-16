@@ -2,7 +2,6 @@
 in highp vec2 aVertexPosition;
 in highp float aZ;
 in uint aData; 
-in uint aTexSlot; 
 in mediump vec4 aVertexColor;
 in highp vec2 aTextureCords;
 
@@ -11,19 +10,19 @@ uniform mat4 uStaticMatrix;
 
 out mediump vec4 vertexColor;
 out highp vec2 texCords;
-flat out uint texSlot;
+flat out uint useTex;
 void main() {
-	if ((aData & uint(0x80)) == uint(0)) {
+	if ((aData & uint(0x1)) == uint(0)) {
 		//use Texture
 		texCords = aTextureCords;
-		texSlot = aTexSlot;
+		useTex = uint(1);
 	} else {
 		//use color
 		vertexColor = aVertexColor;
-		texSlot = uint(32);
+		useTex = uint(0);
 	}
 	
-	if ((aData & uint(0x40)) == uint(0)) {
+	if ((aData & uint(0x2)) == uint(0)) {
 		//use projection matrix
 		gl_Position = uProjectionMatrix * vec4(aVertexPosition, aZ, 1);
 	} else {

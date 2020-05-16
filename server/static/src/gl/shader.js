@@ -7,14 +7,11 @@ export function initMainShader() {
 	mainShader.addAttribute("aVertexPosition");
 	mainShader.addAttribute("aZ");
 	mainShader.addAttribute("aData");
-	mainShader.addAttribute("aTexSlot");
 	mainShader.addAttribute("aVertexColor");
 	mainShader.addAttribute("aTextureCords");
 	mainShader.addUniform("uProjectionMatrix");
 	mainShader.addUniform("uStaticMatrix");
-	for (var i = 0; i < 32; i++) {
-		mainShader.addUniform("uTextures[" + i + "]");
-	}
+	mainShader.addUniform("uTexture");
 	
 	//set uStaticMatrix
 	mainShader.setUniformMat4("uStaticMatrix", Mat4ortho(0, 0, 640, 480));

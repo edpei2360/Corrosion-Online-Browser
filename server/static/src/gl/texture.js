@@ -2,10 +2,11 @@ import {gl} from "./glManager.js"
 import {mainShader} from "./shader.js"
 import {stopLoading} from "./loading.js"
 
-export var textureAtlases = [];
+export var textureAtlase;
 
 export function initTextures() {
-	textureAtlases.push(new TextureAtlas("/static/res/test.png", textureLoaded));
+	//can only be one
+	textureAtlase = new TextureAtlas("/static/res/test.png", textureLoaded);
 }
 
 var texturesToLoad = 1;
@@ -20,8 +21,8 @@ export function textureLoaded() {
 //
 export function generateSubTextures() {
 	//tmp
-		texPoop = textureAtlases[0].getTexture(0, 0, 255, 256);
-		texCircle = textureAtlases[0].getTexture(256, 0, 256, 256);
+		texPoop = textureAtlase.getTexture(0, 0, 255, 256);
+		texCircle = textureAtlase.getTexture(256, 0, 256, 256);
 	//
 }
 
