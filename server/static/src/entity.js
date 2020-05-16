@@ -282,23 +282,9 @@ export class Entity {
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	translateTo(x, y) {
-		const data = new Float32Array(this.vertexData.buffer);
-		x -= this.translation[X];
-		y -= this.translation[Y];
-		//top right
-		data[OFFSET_TOP_LEFT_X] += x;
-		data[OFFSET_TOP_LEFT_Y] += y;
-		//top right
-		data[OFFSET_TOP_RIGHT_X] += x;
-		data[OFFSET_TOP_RIGHT_Y] += y;
-		//bottom right
-		data[OFFSET_BOTTOM_RIGHT_X] += x;
-		data[OFFSET_BOTTOM_RIGHT_Y] += y;
-		//bottom left
-		data[OFFSET_BOTTOM_LEFT_X] += x;
-		data[OFFSET_BOTTOM_LEFT_Y] += y;
 		this.translation[X] = x;
 		this.translation[Y] = y;
+		this.transform();
 	}
 
 	/*

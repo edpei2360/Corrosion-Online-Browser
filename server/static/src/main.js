@@ -20,20 +20,6 @@ function main() {
 	//code to run on window load
 
 	//
-
-	//tell server new player has connected
-	socket.emit('new player');
-
-	//moved here because shaders take to long to load and result in no data sent
-	// store a temporary version of the data every time new player joins
-	// should only be used as position reference
-	socket.on('update local log', function(players, id) {
-	  localData = players;
-		console.log("fuck you cunt");
-		entitiesDict[id] = new Entity();
-		//console.log("asdjiasidojsadoiisdjoasijdaoisjdoij");
-	});
-
 }
 
 var entitiesDict = {};
@@ -45,7 +31,19 @@ export function loaded() {
 	//code to run once textures, shaders, rest of webgl stuff has finished loading
 
 	//
+	//tell server new player has connected
+	socket.emit('new player');
 
+	//moved here because shaders take to long to load and result in no data sent
+	// store a temporary version of the data every time new player joins
+	// should only be used as position reference
+	socket.on('update local log', function(players, id) {
+	  localData = players;
+		console.log("fuck you cunt");
+		entitiesDict[id] = new Entity();
+		entitiesDict[id].setTexture(texPoop);
+	});
+	
 	socket.on('remove player', function(data) {
 		delete localData[data];
 		delete entitiesDict[data];
@@ -90,10 +88,8 @@ function loop() {
 	// draw all entities
 	for (var id in entitiesDict) {
     var ent = entitiesDict[id];
-
-		ent.setTexture(texPoop);
 		// IDK how this works still
-		ent.translateTo(localData[id].x_pos_player/1000,localData[id].y_pos_player/1000);
+		ent.translateTo(localData[id].x_pos_player*0.01,localData[id].y_pos_player*0.01);
 		ent.sendDataToGPU();
 		//console.log("asjdoiasdoij");
   }
