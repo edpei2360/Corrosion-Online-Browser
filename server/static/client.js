@@ -7,6 +7,7 @@
          to increase the efficiency of what the fuck ur doing
 */
 
+/*
 var socket = io();
 
 //tell server new player has connected
@@ -24,6 +25,7 @@ var serverData;
 socket.on('transmit', function(players) {
   serverData = players;
 });
+*/
 
 /*
 //draw players (done for testing will be removed/modified in future)

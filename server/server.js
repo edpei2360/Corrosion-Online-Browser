@@ -33,7 +33,7 @@ io.on('connection', function(socket) {
 });
 
 /* TODO: add any new variables that need to be sent
-
+         make it so that server only forwards data
 */
 
 
@@ -133,5 +133,3 @@ io.on('connection', function(socket) {
 setInterval(function() {
   io.sockets.emit('transmit', players);
 }, 1000 / 60);
-
-

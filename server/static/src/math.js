@@ -4,7 +4,7 @@
  * 1  5  9 13
  * 2  6 10 14
  * 3  7 11 15
- * 
+ *
  * mat3 index format
  * 0 3 6
  * 1 4 7
@@ -110,7 +110,7 @@ export function Mat3transformVec2(m, v){
  * trig: vec2 [sin(rads), cos(rads)]
  * scale: vec2
  * offset: vec2
- * 
+ *
  * in the following order
  *  translates by -offset
  *  scales vertically and horizontally (centered at 0,0)
@@ -122,7 +122,7 @@ export function transformVec2(v, trans, trig, scale, offset){
 	const c = trig[1];
 	const x = v[0];
 	const y = v[1];
-	
+
 	v[0] = trans[0] + scale[0]*c*(x - offset[0]) + scale[1]*s*(offset[1] - y);
 	v[1] = trans[1] + scale[0]*s*(x - offset[0]) + scale[1]*c*(y - offset[1]);
 	return v;

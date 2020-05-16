@@ -1,3 +1,4 @@
+/**
 // moves player by small increments to their new position
 function moveTo(p_id) {
   var difference_y = serverData[p_id].y_pos_player - localData[p_id].y_pos_player;
@@ -28,7 +29,9 @@ setInterval(function() {
   }
 }, 1000/ 500);
 
+**/
 
+/**
 // tell the server how to move the player and keeps track of
 // keeps track of how many milis have passed and uses it to
 // compared to what should actually happen inorder to keep the
@@ -43,3 +46,4 @@ setInterval(function() {
 
   lastUpdateTime = currentTime;
 }, 1000 / 60);
+**/
