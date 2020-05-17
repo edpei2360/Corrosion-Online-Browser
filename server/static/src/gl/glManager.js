@@ -4,9 +4,10 @@ import {initVertexArray} from "./vertexarray.js"
 import {startLoading} from "./loading.js"
 
 export var gl;
+export var canvas;
 
 export function glInit() {
-	const canvas = document.querySelector("#glCanvas");
+	canvas = document.querySelector("#glCanvas");
 	// Initialize the GL context
 	gl = canvas.getContext("webgl2");
 

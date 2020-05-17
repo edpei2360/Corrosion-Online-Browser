@@ -27,6 +27,6 @@ void main() {
 		gl_Position = uProjectionMatrix * vec4(aVertexPosition, aZ, 1);
 	} else {
 		//use static matrix
-		gl_Position = uStaticMatrix * vec4(aVertexPosition, aZ, 1);//CHANGE TMP JUST FOR DEBUGGING
+		gl_Position = uStaticMatrix * vec4(aVertexPosition, aZ, 1);
 	}
 }

@@ -21,8 +21,8 @@ export function textureLoaded() {
 //
 export function generateSubTextures() {
 	//tmp
-		texPoop = textureAtlase.getTexture(0, 0, 255, 256);
-		texCircle = textureAtlase.getTexture(256, 0, 256, 256);
+		texPoop = textureAtlase.getTexture(0, 0, 254, 256);
+		texCircle = textureAtlase.getTexture(255, 0, 256, 256);
 	//
 }
 
@@ -65,11 +65,10 @@ export class TextureAtlas {
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, image.width, 
 			image.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, image);
 		
-		//TODO find best settings
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //gl.NEAREST ???
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); //gl.NEAREST ???
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); 
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		
 		mainShader.setUniformUInt("textures" + this.texSlot, this.texSlot);
 		

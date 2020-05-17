@@ -322,6 +322,7 @@ export class Entity {
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	rotateToVec(x, y) {
+		if (x == 0 && y == 0) return;
 		const h = Math.sqrt(x*x + y*y);
 		this.trig[SIN] = y/h;
 		this.trig[COS] = x/h;
@@ -335,6 +336,7 @@ export class Entity {
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	rotateVec(x, y) {
+		if (x == 0 && y == 0) return;
 		const h = Math.sqrt(x*x + y*y);
 		const s = y/h;
 		const c = x/h;

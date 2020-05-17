@@ -1,4 +1,8 @@
-/*
+/* 
+ * CHANGES:
+ * 	changed entitiesDict to playersDict
+ * 	.remove() in remove player
+ * 
  * TODO:
  * 	semitransparent entities
  * 	text
@@ -7,31 +11,39 @@
  * 	fix annoying warning "XMLHttpRequest on the main thread ..."
  *
  *  seperate interpolation into sub file (ask micheal how he wants to organize it)
+ * 		put it in player.js
+ * 
+ * 	rotation only effect mainplayer
+ * 
+ * 	move movement calculations onto client side
+ * 	send rotation data as vector and use rotateToVec
+ * 	keep main player in center of screen using entity.setStatic() (will need to setScale)
+ * 	
+ * 	key/mouse bind system
  */
 
 var socket = io();
 
-import {glInit} from "./gl/glManager.js"
-import {setCamera, moveCamera} from "./gl/camera.js"//tmp
-import {Entity} from "./entity.js"//tmp
-import {texPoop, texCircle} from "./gl/texture.js"//tmp
+import {glInit, canvas} from "./gl/glManager.js"
+import {setCamera, moveCamera} from "./gl/camera.js"
+import {Entity} from "./entity.js"
+import {texPoop, texCircle} from "./gl/texture.js"
 
 function main() {
 	glInit();
-	//code to run on window load
-
-	//
 }
 
-var entitiesDict = {};
+var playersDict = {};
 var localData;
 var serverData;
 export function loaded() {
 	setCamera(0, 0);
-
-	//code to run once textures, shaders, rest of webgl stuff has finished loading
-
-	//
+	
+	//mouse stuff
+	canvas.addEventListener("mousemove", onMouseMove);
+	canvas.addEventListener("mousedown", onMouseDown);
+	canvas.addEventListener("mouseup", onMouseUp);
+	
 	//tell server new player has connected
 	socket.emit('new player');
 
@@ -41,21 +53,22 @@ export function loaded() {
 	socket.on('update local log', function(players, id) {
 	  localData = players;
 		// add new entity
-		entitiesDict[id] = new Entity();
+		playersDict[id] = new Entity();
 
 		// if client is missing any entites add them
 		for(var id in players) {
-			if (!(id in entitiesDict)) {
-				entitiesDict[id] = new Entity();
-				entitiesDict[id].setTexture(texPoop); // change others texture
+			if (!(id in playersDict)) {
+				playersDict[id] = new Entity();
+				playersDict[id].setTexture(texCircle); // change others texture
 			}
 		}
-		entitiesDict[id].setTexture(texPoop); // change main player texture
+		playersDict[id].setTexture(texCircle); // change main player texture
 	});
 
 	socket.on('remove player', function(data) {
 		delete localData[data];
-		delete entitiesDict[data];
+		playersDict[data].remove();
+		delete playersDict[data];
 	});
 
 	// stores the data that was transmitted by the server
@@ -84,8 +97,8 @@ function moveTo(p_id) {
   }
 
 	// draw sub frames of movement
-	entitiesDict[p_id].translateTo(localData[p_id].x_pos_player * 0.1,localData[p_id].y_pos_player * 0.1);
-	entitiesDict[p_id].sendDataToGPU();
+	playersDict[p_id].translateTo(localData[p_id].x_pos_player * 0.1,localData[p_id].y_pos_player * 0.1);
+	playersDict[p_id].sendDataToGPU();
 
 }
 
@@ -95,13 +108,9 @@ function loop() {
 	const t = tnow - told;
 	told = tnow;
 
-	//game logic loop (runs 60 times a second)
-
-	//
-
-	// draw all entities atleast once every 60th of a second
-	for (var id in entitiesDict) {
-    var ent = entitiesDict[id];
+	// draw all entities atleast once every 60th of a second (shouldn't be needed as moveTo should set the changes)
+	for (var id in playersDict) {
+    var ent = playersDict[id];
 		ent.translateTo(localData[id].x_pos_player * 0.1,localData[id].y_pos_player * 0.1);
 		ent.sendDataToGPU();
   }
@@ -115,7 +124,24 @@ function loop() {
       moveTo(id);
     }
   }
-
 }
 
 window.onload = main;
+
+function onMouseMove(evt) {
+	const rect = canvas.getBoundingClientRect();
+	const x = evt.clientX - rect.left - 320;
+	const y = rect.top + 240 - evt.clientY;
+	//TODO only effect mainPlayer
+	for (var id in playersDict) {
+    var ent = playersDict[id];
+		ent.rotateToVec(x, y);
+		ent.sendDataToGPU();
+  }
+}
+
+function onMouseDown(evt) {
+}
+
+function onMouseUp(evt) {
+}
