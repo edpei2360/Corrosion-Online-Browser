@@ -5,7 +5,8 @@
  *
  * 	documentation :(
  * 	fix annoying warning "XMLHttpRequest on the main thread ..."
- *  shaders dont work in chrome! only work in firefox
+ *
+ *  seperate interpolation into sub file (ask micheal how he wants to organize it)
  */
 
 var socket = io();
@@ -39,11 +40,19 @@ export function loaded() {
 	// should only be used as position reference
 	socket.on('update local log', function(players, id) {
 	  localData = players;
-		console.log("fuck you cunt");
+		// add new entity
 		entitiesDict[id] = new Entity();
-		entitiesDict[id].setTexture(texPoop);
+
+		// if client is missing any entites add them
+		for(var id in players) {
+			if (!(id in entitiesDict)) {
+				entitiesDict[id] = new Entity();
+				entitiesDict[id].setTexture(texPoop); // change others texture
+			}
+		}
+		entitiesDict[id].setTexture(texPoop); // change main player texture
 	});
-	
+
 	socket.on('remove player', function(data) {
 		delete localData[data];
 		delete entitiesDict[data];
@@ -63,8 +72,8 @@ function moveTo(p_id) {
   var difference_y = serverData[p_id].y_pos_player - localData[p_id].y_pos_player;
   var difference_x = serverData[p_id].x_pos_player - localData[p_id].x_pos_player;
 
-  localData[p_id].y_pos_player += difference_y/5;
-  localData[p_id].x_pos_player += difference_x/5;
+  localData[p_id].y_pos_player += difference_y/10;
+  localData[p_id].x_pos_player += difference_x/10;
 
   // prevent the calculations going on forever
   if(Math.abs(difference_y) < 0.5) {
@@ -73,6 +82,11 @@ function moveTo(p_id) {
   if(Math.abs(difference_x) < 0.5) {
     localData[p_id].x_pos_player = serverData[p_id].x_pos_player
   }
+
+	// draw sub frames of movement
+	entitiesDict[p_id].translateTo(localData[p_id].x_pos_player * 0.1,localData[p_id].y_pos_player * 0.1);
+	entitiesDict[p_id].sendDataToGPU();
+
 }
 
 var told;
@@ -85,20 +99,18 @@ function loop() {
 
 	//
 
-	// draw all entities
+	// draw all entities atleast once every 60th of a second
 	for (var id in entitiesDict) {
     var ent = entitiesDict[id];
-		// IDK how this works still
-		ent.translateTo(localData[id].x_pos_player*0.01,localData[id].y_pos_player*0.01);
+		ent.translateTo(localData[id].x_pos_player * 0.1,localData[id].y_pos_player * 0.1);
 		ent.sendDataToGPU();
-		//console.log("asjdoiasdoij");
   }
 
   key_input.time_modification = t;
 	socket.emit('key input', key_input);
 
   for (var id in localData) {
-    if ((localData[id].x_pos_player != serverData[id].x_pos_player) ||
+    while ((localData[id].x_pos_player != serverData[id].x_pos_player) ||
         (localData[id].y_pos_player != serverData[id].y_pos_player)) {
       moveTo(id);
     }

@@ -28,7 +28,7 @@ io.on('connection', function(socket) {
 
     socket.on('disconnect', function () {
       delete players[socket.id]
-      io.sockets.emit('remove player', socket.id);
+        io.sockets.emit('remove player', socket.id);
         console.log('A user disconnected');
     });
 });
@@ -97,9 +97,9 @@ io.on('connection', function(socket) {
   // with default values
   socket.on('new player', function() {
     players[socket.id] = {
-      x_pos_player: 300,
-      y_pos_player: 300,
-      p_vel : 3
+      x_pos_player: 0,
+      y_pos_player: 0,
+      p_vel : 1
     };
     io.sockets.emit('update local log', players, socket.id);
   });
@@ -118,7 +118,7 @@ io.on('connection', function(socket) {
     }
 
     if (data.up) {
-      player.y_pos_player -= player.p_vel * (( data.time_modification / (1000 / 60)));
+      player.y_pos_player += player.p_vel * (( data.time_modification / (1000 / 60)));
     }
 
     if (data.right) {
@@ -126,7 +126,7 @@ io.on('connection', function(socket) {
     }
 
     if (data.down) {
-      player.y_pos_player += player.p_vel * (( data.time_modification / (1000 / 60)));
+      player.y_pos_player -= player.p_vel * (( data.time_modification / (1000 / 60)));
     }
 
   });
