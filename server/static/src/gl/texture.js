@@ -18,11 +18,16 @@ export function textureLoaded() {
 //tmp
 	export var texPoop;
 	export var texCircle;
+	export const texText = {};
 //
 export function generateSubTextures() {
 	//tmp
 		texPoop = textureAtlase.getTexture(0, 0, 254, 256);
 		texCircle = textureAtlase.getTexture(255, 0, 256, 256);
+		//           A        Z
+		for (var i = 65; i <= 90; ++i) {
+			texText[i] = textureAtlase.getTexture(6*(i-65), 256, 5, 7);
+		}
 	//
 }
 

@@ -28,6 +28,7 @@ import {glInit, canvas} from "./gl/glManager.js"
 import {setCamera, moveCamera} from "./gl/camera.js"
 import {Entity} from "./entity.js"
 import {texPoop, texCircle} from "./gl/texture.js"
+import {Text} from "./text.js"
 
 function main() {
 	glInit();
@@ -38,7 +39,18 @@ var localData;
 var serverData;
 export function loaded() {
 	setCamera(0, 0);
-
+	
+	//text test
+		//background
+		var e = new Entity(100,100);
+		e.setColor(128,128,128);
+		e.transform();
+		e.sendDataToGPU();
+		
+		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM",0,0,1,10);
+	//test
+	
+	
 	//mouse stuff
 	canvas.addEventListener("mousemove", onMouseMove);
 	canvas.addEventListener("mousedown", onMouseDown);
@@ -99,7 +111,6 @@ function moveTo(p_id) {
 	// draw sub frames of movement
 	playersDict[p_id].translateTo(localData[p_id].x_pos_player * 0.1,localData[p_id].y_pos_player * 0.1);
 	playersDict[p_id].sendDataToGPU();
-
 }
 
 var told;
