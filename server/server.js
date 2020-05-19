@@ -3,28 +3,19 @@ var socketIO = require('socket.io');
 var express = require('express');
 var http = require('http');
 var path = require('path');
+var routing = require('./routing.js');
 
-var app = express();
-var server = http.Server(app);
-var io = socketIO(server);
+var app = routing.app;
+var server = routing.server;
+var io = routing.io;
 
-app.set('port', 5000);
-app.use('/static', express.static(__dirname + '/static'));
+routing.establish();
+routing.route();
+routing.start_server();
 
-// Routing
-app.get('/', function(request, response) {
-  response.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// start server
-server.listen(5000, function() {
-  console.log('Starting server on port 5000');
-});
-
-// handles connection and dissconnection msg
+// handles connection and dissconnection
 io.on('connection', function(socket) {
-    console.log('A user connected');
-
+    console.log('someone has connected');
 
     socket.on('disconnect', function () {
       delete players[socket.id]
@@ -33,12 +24,35 @@ io.on('connection', function(socket) {
     });
 });
 
+/*
+var app = express();
+var server = http.Server(app);
+var io = socketIO(server);
+
+var PORT = 5000;
+
+app.set('port', PORT);
+app.use('/static', express.static(__dirname + '/static'));
+
+// Routing
+app.get('/', function(request, response) {
+  response.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// start server
+server.listen(PORT, function() {
+  console.log('Starting server on port: ' + PORT);
+});
+
+*/
+
 /* TODO: add any new variables that need to be sent
          make it so that server only forwards data
          make it so the functions in the io.on and server.listen are their own thing
          make it so client does calculations
+         seperate all functions in socket.on type things into their own functions!
+         organize all your stuff because its IMPOSSIBLE to read
 */
-
 
 // create empty dictionary to store players in
 // setters and getters for this are below

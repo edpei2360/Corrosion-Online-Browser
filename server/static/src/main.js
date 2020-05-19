@@ -1,8 +1,8 @@
-/* 
+/*
  * CHANGES:
  * 	changed entitiesDict to playersDict
  * 	.remove() in remove player
- * 
+ *
  * TODO:
  * 	semitransparent entities
  * 	text
@@ -12,13 +12,13 @@
  *
  *  seperate interpolation into sub file (ask micheal how he wants to organize it)
  * 		put it in player.js
- * 
+ *
  * 	rotation only effect mainplayer
- * 
+ *
  * 	move movement calculations onto client side
  * 	send rotation data as vector and use rotateToVec
  * 	keep main player in center of screen using entity.setStatic() (will need to setScale)
- * 	
+ *
  * 	key/mouse bind system
  */
 
@@ -38,12 +38,12 @@ var localData;
 var serverData;
 export function loaded() {
 	setCamera(0, 0);
-	
+
 	//mouse stuff
 	canvas.addEventListener("mousemove", onMouseMove);
 	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mouseup", onMouseUp);
-	
+
 	//tell server new player has connected
 	socket.emit('new player');
 
