@@ -75,6 +75,8 @@ export function loaded() {
 			}
 		}
 		playersDict[id].setTexture(texCircle); // change main player texture
+		playersDict[id].translateTo(0,0);//change to position given by server
+		playersDict[id].sendDataToGPU()
 	});
 
 	socket.on('remove player', function(data) {
@@ -118,13 +120,6 @@ function loop() {
 	const tnow = performance.now();
 	const t = tnow - told;
 	told = tnow;
-
-	// draw all entities atleast once every 60th of a second (shouldn't be needed as moveTo should set the changes)
-	for (var id in playersDict) {
-    var ent = playersDict[id];
-		ent.translateTo(localData[id].x_pos_player * 0.1,localData[id].y_pos_player * 0.1);
-		ent.sendDataToGPU();
-  }
 
   key_input.time_modification = t;
 	socket.emit('key input', key_input);
