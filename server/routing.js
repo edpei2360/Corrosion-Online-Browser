@@ -10,6 +10,11 @@ var io = socketIO(server);
 
 var PORT = 5000;
 
+/* TODO:
+ * put server.js and routing.js in seperate folders while not breaking routing
+ * do the send file "{root:}" thingy or the require thingy
+*/
+
 // export routing functions
 module.exports = {
   // bind port and etablish sending of static folder

@@ -1,8 +1,5 @@
-// dependencies
+// dependencies/*
 var socketIO = require('socket.io');
-var express = require('express');
-var http = require('http');
-var path = require('path');
 var routing = require('./routing.js');
 
 var app = routing.app;
@@ -23,36 +20,6 @@ io.on('connection', function(socket) {
         console.log('A user disconnected');
     });
 });
-
-/*
-var app = express();
-var server = http.Server(app);
-var io = socketIO(server);
-
-var PORT = 5000;
-
-app.set('port', PORT);
-app.use('/static', express.static(__dirname + '/static'));
-
-// Routing
-app.get('/', function(request, response) {
-  response.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// start server
-server.listen(PORT, function() {
-  console.log('Starting server on port: ' + PORT);
-});
-
-*/
-
-/* TODO: add any new variables that need to be sent
-         make it so that server only forwards data
-         make it so the functions in the io.on and server.listen are their own thing
-         make it so client does calculations
-         seperate all functions in socket.on type things into their own functions!
-         organize all your stuff because its IMPOSSIBLE to read
-*/
 
 // create empty dictionary to store players in
 // setters and getters for this are below
@@ -124,7 +91,6 @@ io.on('connection', function(socket) {
   // more consistent movement as the client is not guarenteed
   // to send data every 60th of a second
   socket.on('key input', function(data) {
-    // NOTE: socket.id is reffering to the id number of the socket which emits a signal
     var player = players[socket.id] || {};
 
     if (data.left) {
