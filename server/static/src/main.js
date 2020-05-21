@@ -7,11 +7,12 @@
  * 	semitransparent entities
  * 	text
  *
+ *  fix entites only being drawn after moving!!
+ *
  * 	documentation :(
  * 	fix annoying warning "XMLHttpRequest on the main thread ..."
  *
- *  seperate interpolation into sub file (ask micheal how he wants to organize it)
- * 		put it in player.js
+ * 	put interpolation in to player.js
  *
  * 	rotation only effect mainplayer
  *
@@ -39,18 +40,18 @@ var localData;
 var serverData;
 export function loaded() {
 	setCamera(0, 0);
-	
+
 	//text test
 		//background
 		var e = new Entity(100,100);
 		e.setColor(128,128,128);
 		e.transform();
 		e.sendDataToGPU();
-		
+
 		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM",0,0,1,10);
 	//test
-	
-	
+
+
 	//mouse stuff
 	canvas.addEventListener("mousemove", onMouseMove);
 	canvas.addEventListener("mousedown", onMouseDown);
@@ -59,7 +60,12 @@ export function loaded() {
 	//tell server new player has connected
 	socket.emit('new player');
 
-	//moved here because shaders take to long to load and result in no data sent
+	socket.on('remove player', function(data) {
+		delete localData[data];
+		playersDict[data].remove();
+		delete playersDict[data];
+	});
+
 	// store a temporary version of the data every time new player joins
 	// should only be used as position reference
 	socket.on('update local log', function(players, id) {
@@ -67,22 +73,21 @@ export function loaded() {
 		// add new entity
 		playersDict[id] = new Entity();
 
-		// if client is missing any entites add them
+		// if client is missing any entites add them to local storage
 		for(var id in players) {
 			if (!(id in playersDict)) {
 				playersDict[id] = new Entity();
 				playersDict[id].setTexture(texCircle); // change others texture
 			}
+			// draw all players that are not main player
+			playersDict[id].setTexture(texCircle);
+			playersDict[id].translateTo(localData[id].x_pos_player * 0.1,localData[id].y_pos_player * 0.1);
+			playersDict[id].sendDataToGPU();
 		}
+		// draw main player
 		playersDict[id].setTexture(texCircle); // change main player texture
 		playersDict[id].translateTo(0,0);//change to position given by server
-		playersDict[id].sendDataToGPU()
-	});
-
-	socket.on('remove player', function(data) {
-		delete localData[data];
-		playersDict[data].remove();
-		delete playersDict[data];
+		playersDict[id].sendDataToGPU();
 	});
 
 	// stores the data that was transmitted by the server
@@ -121,6 +126,7 @@ function loop() {
 	const t = tnow - told;
 	told = tnow;
 
+	// send key inputs
   key_input.time_modification = t;
 	socket.emit('key input', key_input);
 
