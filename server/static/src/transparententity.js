@@ -202,7 +202,7 @@ export class TransparentEntity {
 			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] &= CLEAR_STATIC_MATRIX_FLAG;
 		}
 	}
-
+	
 	_setZ(z) {
 		const data = new Uint16Array(this._vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {

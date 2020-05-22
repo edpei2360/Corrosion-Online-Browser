@@ -48,16 +48,17 @@ export function loaded() {
 		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM",0,0,1,10);
 		
 		//adds red tint
+		const colors = [[255,0,0,128],[0,255,0,128],[0,0,255,128]];
 		const arr = [];
-		for (var x = 0; x < 8; x++) {
-			var tint = new TransparentEntity(0xffff);
-			tint.setColor(255,0,0,128);
-			tint.translateTo(x-4,x-4);
+		for (var x = -4; x < 4; x++) {
+			var tint = new TransparentEntity(201);
+			tint.setColor(...colors[(x+4)%3]);
+			tint.translateTo(x,x);
 			tint.sendDataToGPU();
 			arr.push(tint);
 		}
 		arr[3].remove();
-		arr[6].remove();
+		arr[5].remove();
 	//test
 
 
@@ -87,7 +88,7 @@ export function loaded() {
 			if (!(id in playersDict)) {
 				playersDict[id] = new Entity();
 				playersDict[id].setTexture(texCircle); // change others texture
-				playersDict[id].setZ(100); 
+				playersDict[id].setZ(100);//need good value
 			}
 			// draw all players that are not main player
 			playersDict[id].setTexture(texCircle);
@@ -97,7 +98,7 @@ export function loaded() {
 		// draw main player
 		playersDict[id].setTexture(texCircle); // change main player texture
 		playersDict[id].translateTo(0,0);//change to position given by server
-		playersDict[id].setZ(200);
+		playersDict[id].setZ(200);//need good value
 		playersDict[id].sendDataToGPU()
 	});
 
