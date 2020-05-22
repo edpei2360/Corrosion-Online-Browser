@@ -59,7 +59,7 @@ export function getTransparentEntity(e) {
 		} else if (transparentEntityArray[mid].z > e.z) {
 			right = Math.max(mid - 1, left);
 		} else {
-			while(transparentEntityArray[mid].z == e.z && mid < right) {
+			while(transparentEntityArray[mid].z == e.z && mid < right) { //TODO change
 				mid++;
 			}
 			left = mid;
