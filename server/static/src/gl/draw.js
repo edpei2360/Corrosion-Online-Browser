@@ -1,10 +1,12 @@
 import {gl} from "./glManager.js"
-import {mainShader} from "./shader.js"
-import {vertexArrays} from "./vertexarray.js"
+import {mainShader, transparentShader} from "./shader.js"
+import {vertexArrays, transparentVertexArrays} from "./vertexarray.js"
+import {loaded} from "../main.js"
 
 function draw() {
 	// Clear the canvas before we start drawing on it.
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	
 	//use main shader
 	mainShader.use()
 	//main drawing
@@ -12,9 +14,15 @@ function draw() {
 		vertexArrays[i].use();
 		gl.drawElements(gl.TRIANGLES, vertexArrays[i].getIndexCount(), gl.UNSIGNED_SHORT, 0);
 	}
+	
+	//transparent drawing
+	transparentShader.use();
+	for (var i = 0; i < transparentVertexArrays.length; i++){
+		transparentVertexArrays[i].use();
+		gl.drawElements(gl.TRIANGLES, transparentVertexArrays[i].getIndexCount(), gl.UNSIGNED_SHORT, 0);
+	}
 }
 
-import {loaded} from "../main.js"
 var drawLoop = null;
 export function startDrawLoop() {
 	if (drawLoop != null) throw "draw loop already running";

@@ -1,4 +1,4 @@
-import {initMainShader} from "./shader.js"
+import {initShaders} from "./shader.js"
 import {initElementBuffer} from "./elementbuffer.js"
 import {initVertexArray} from "./vertexarray.js"
 import {startLoading} from "./loading.js"
@@ -9,7 +9,7 @@ export var canvas;
 export function glInit() {
 	canvas = document.querySelector("#glCanvas");
 	// Initialize the GL context
-	gl = canvas.getContext("webgl2");
+	gl = canvas.getContext("webgl2", {premultipliedAlpha: false});
 
 	// Only continue if WebGL is available and working
 	if (gl === null) {
@@ -26,13 +26,12 @@ export function glInit() {
 	gl.clearDepth(0.0);                 // Clear everything
 	gl.enable(gl.DEPTH_TEST);           // Enable depth testing
 	gl.depthFunc(gl.GEQUAL);            // Near things obscure far things
-
+	
 	//enable transparency
 	gl.enable(gl.BLEND)
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-	//compile main shader
-	initMainShader();
+	initShaders();
 	
 	//init va
 	initElementBuffer();

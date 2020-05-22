@@ -1,8 +1,4 @@
 /*
- * CHANGES:
- * 	changed entitiesDict to playersDict
- * 	.remove() in remove player
- *
  * TODO:
  * 	semitransparent entities
  * 	text
@@ -28,6 +24,7 @@ var socket = io();
 import {glInit, canvas} from "./gl/glManager.js"
 import {setCamera, moveCamera} from "./gl/camera.js"
 import {Entity} from "./entity.js"
+import {TransparentEntity} from "./transparententity.js"
 import {texPoop, texCircle} from "./gl/texture.js"
 import {Text} from "./text.js"
 
@@ -49,6 +46,18 @@ export function loaded() {
 		e.sendDataToGPU();
 
 		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM",0,0,1,10);
+		
+		//adds red tint
+		const arr = [];
+		for (var x = 0; x < 8; x++) {
+			var tint = new TransparentEntity(0xffff);
+			tint.setColor(255,0,0,128);
+			tint.translateTo(x-4,x-4);
+			tint.sendDataToGPU();
+			arr.push(tint);
+		}
+		arr[3].remove();
+		arr[6].remove();
 	//test
 
 
@@ -78,6 +87,7 @@ export function loaded() {
 			if (!(id in playersDict)) {
 				playersDict[id] = new Entity();
 				playersDict[id].setTexture(texCircle); // change others texture
+				playersDict[id].setZ(100); 
 			}
 			// draw all players that are not main player
 			playersDict[id].setTexture(texCircle);
@@ -87,7 +97,14 @@ export function loaded() {
 		// draw main player
 		playersDict[id].setTexture(texCircle); // change main player texture
 		playersDict[id].translateTo(0,0);//change to position given by server
-		playersDict[id].sendDataToGPU();
+		playersDict[id].setZ(200);
+		playersDict[id].sendDataToGPU()
+	});
+
+	socket.on('remove player', function(data) {
+		delete localData[data];
+		playersDict[data].remove();
+		delete playersDict[data];
 	});
 
 	// stores the data that was transmitted by the server

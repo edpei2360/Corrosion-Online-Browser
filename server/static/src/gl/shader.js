@@ -2,7 +2,14 @@ import {gl} from "./glManager.js"
 import {Mat4ortho} from "../math.js"
 
 export var mainShader;
-export function initMainShader() {
+export var transparentShader;
+
+export function initShaders() {
+	initMainShader();
+	initTransparentShaders();
+}
+
+function initMainShader() {
 	mainShader = new Shader("/static/src/shaders/mainShader/vs.glsl", "/static/src/shaders/mainShader/fs.glsl");
 	mainShader.addAttribute("aVertexPosition");
 	mainShader.addAttribute("aZ");
@@ -15,6 +22,21 @@ export function initMainShader() {
 	
 	//set uStaticMatrix
 	mainShader.setUniformMat4("uStaticMatrix", Mat4ortho(0, 0, 640, 480));
+}
+
+function initTransparentShaders() {
+	transparentShader = new Shader("/static/src/shaders/transparentShader/vs.glsl", "/static/src/shaders/transparentShader/fs.glsl");
+	transparentShader.addAttribute("aVertexPosition");
+	transparentShader.addAttribute("aZ");
+	transparentShader.addAttribute("aData");
+	transparentShader.addAttribute("aVertexColor");
+	transparentShader.addAttribute("aTextureCords");
+	transparentShader.addUniform("uProjectionMatrix");
+	transparentShader.addUniform("uStaticMatrix");
+	transparentShader.addUniform("uTexture");
+	
+	//set uStaticMatrix
+	transparentShader.setUniformMat4("uStaticMatrix", Mat4ortho(0, 0, 640, 480));
 }
 
 //gets shader source code

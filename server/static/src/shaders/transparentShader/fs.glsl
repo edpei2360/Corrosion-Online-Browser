@@ -15,5 +15,4 @@ void main() {
 		//use texture
 		outColor = texture(uTexture, texCords);
 	}
-	if (outColor.w != 1.0) discard;
 }

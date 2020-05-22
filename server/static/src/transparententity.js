@@ -1,4 +1,4 @@
-import {getEntity, setData, removeEntity} from "./gl/vertexarray.js"
+import {getTransparentEntity, setTransparentData, removeTransparentEntity} from "./gl/vertexarray.js"
 import {Vec2, transformVec2} from "./math.js"
 import {ENTITY_SIZE_8, VERTEXS_PER_ENTITY, VERTEX_SIZE_8, VERTEX_SIZE_16} from "./gl/global.js"
 
@@ -9,7 +9,7 @@ import {ENTITY_SIZE_8, VERTEXS_PER_ENTITY, VERTEX_SIZE_8, VERTEX_SIZE_16} from "
  */
 
 //contains all entities
-export const entityArray = [];
+export const transparentEntityArray = [];
 
 //Clear Flag (use &= to apply)
 const CLEAR_COLOR_FLAG = 0xfffe;
@@ -58,20 +58,18 @@ const SIN = 0;
 const COS = 1;
 
 /*
- * class Entity
- * 	int index: The index of this Entity in entityArray
- * 	vertexs: Stores which vertexarray and at what offset this entity is
- * 		stored on the GPU.
- * 	Vec2 scale: Scale of x and y of the Entity. Negative values mirror the Entity.
+ * class TransparentEntity
+ * 	int index: The index of this TransparentEntity in entityArray
+ * 	Vec2 scale: Scale of x and y of the Entity. Negative values mirror the TransparentEntity.
  * 		default scale = [1.0, 1.0]
  * 	Vec2 translation: The current position of the center of the Entity.
  * 	Vec2 trig: Contains [sin(rads), cos[rads]] where rads is the current
- * 		rotation in radians of the Entity
- * 	Vec2 offset: Moves the point of rotation/scale of the entity.
+ * 		rotation in radians of the TransparentEntity
+ * 	Vec2 offset: Moves the point of rotation/scale of the TransparentEntity.
  * 		By default it is in the center of the square.
  * 		positive offset move the point of rotation/scale right and up, negative down and left
  * 		default offset = [0.0, 0.0]
- * 	int z: The z position of the Entity. Higher get drawn on top.
+ * 	int z: The z position of the TransparentEntity. Higher get drawn on top.
  * 		z should be in inclusive range(0, 65535)
  * 		default  z = 0
  * 	UInt8Array vertexData: Buffer of most up to date vertex data.
@@ -81,22 +79,22 @@ const COS = 1;
  * NOTE:
  * 	e.translateTo(x, y) must be called to begin drawing the entity
  */
-export class Entity {
-	constructor(scaleX = 1.0, scaleY = 1.0, offsetX = 0.0, offsetY = 0.0) {
-		getEntity(this);// sets this.vertexs and this.index
+export class TransparentEntity {
+	constructor(z, scaleX = 1.0, scaleY = 1.0, offsetX = 0.0, offsetY = 0.0) {
 		this.scale = Vec2(scaleX, scaleY);
 		this.translation = Vec2();
 		this.trig = Vec2(0.0, 1.0); //[sin(rads), cos(rads)]
 		this.offset = Vec2(offsetX, offsetY);
-		this.z = 0;
 
 		//init data
-		this.setVertexs(new Uint8Array(ENTITY_SIZE_8));
+		this._setVertexs(new Uint8Array(ENTITY_SIZE_8));
+		this._setZ(z);
+		getTransparentEntity(this);
 		this.sendDataToGPU();
 	}
 
 	/*
-	 * Sets the vertexs of the entity by given data.
+	 * Sets the vertexs of the TransparentEntity by given data.
 	 * ArrayBuffer data: data change vertexs to.
 	 *
 	 * data.byteLength == ENTITY_SIZE_8
@@ -104,10 +102,11 @@ export class Entity {
 	 *
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
-	setVertexs(data) {
+	_setVertexs(data) {
 		if (data.byteLength != ENTITY_SIZE_8) {
 			throw "Data not proper len:" + data.byteLength + " != " + ENTITY_SIZE_8;
 		}
+		this._vertexData = new Uint8Array(data.buffer);
 		this.vertexData = new Uint8Array(data.buffer);
 	}
 
@@ -115,24 +114,25 @@ export class Entity {
 	 * Send vertex data to the vertexArray for further processing
 	 */
 	sendDataToGPU() {
-		setData(this.vertexs, this.vertexData);
+		setTransparentData(this.index, this._vertexData);
+		this.vertexData = new Uint8Array(this._vertexData);
 	}
 
 	/*
-	 * Removes the entity.
+	 * Removes the TransparentEntity.
 	 */
 	remove() {
-		removeEntity(this);
+		removeTransparentEntity(this);
 	}
 
 	/*
-	 * Sets the current texture of the entity.
+	 * Sets the current texture of the TransparentEntity.
 	 * Texture tex: the texture to set.
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 * NOTE: Removes the current color.
 	 */
 	setTexture(tex) {
-		const data16 = new Uint16Array(this.vertexData.buffer);
+		const data16 = new Uint16Array(this._vertexData.buffer);
 
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] &= CLEAR_COLOR_FLAG;
@@ -156,7 +156,7 @@ export class Entity {
 	}
 
 	/*
-	 * Sets the current color of the entity.
+	 * Sets the current color of the TransparentEntity.
 	 * int r: The red value of the color.
 	 * 		r should be in inclusive range(0, 255)
 	 * int g: The green value of the color.
@@ -166,62 +166,56 @@ export class Entity {
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 * NOTE: remove current texture
 	 */
-	setColor(r,g,b){
-		const data16 = new Uint16Array(this.vertexData.buffer);
+	setColor(r,g,b,a){
+		const data16 = new Uint16Array(this._vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] |= SET_COLOR_FLAG;
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_R] = r;
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_G] = g;
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_B] = b;
-			this.vertexData[i*VERTEX_SIZE_8 + OFFSET_A] = 255;
+			this._vertexData[i*VERTEX_SIZE_8 + OFFSET_R] = r;
+			this._vertexData[i*VERTEX_SIZE_8 + OFFSET_G] = g;
+			this._vertexData[i*VERTEX_SIZE_8 + OFFSET_B] = b;
+			this._vertexData[i*VERTEX_SIZE_8 + OFFSET_A] = a;
 		}
 	}
 
 	/*
-	 * Makes it so the entity is not effectied by the ProjectionMatrix and
+	 * Makes it so the TransparentEntity is not effectied by the ProjectionMatrix and
 	 * 		instead by the StaticMatrix. (not effected by moveCamera/setCamera)
-	 * NOTE: Entitiy are by default Dynamic not Static.
+	 * NOTE: TransparentEntity are by default Dynamic not Static.
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	setStatic() {
-		const data16 = new Uint16Array(this.vertexData.buffer);
+		const data16 = new Uint16Array(this._vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] |= SET_STATIC_MATRIX_FLAG;
 		}
 	}
 
 	/*
-	 * Makes it so the entity is effectied by the ProjectionMatrix and
+	 * Makes it so the TransparentEntity is effectied by the ProjectionMatrix and
 	 * 		not by the StaticMatrix. (effected by moveCamera/setCamera)
-	 * NOTE: Entitiy are by default Dynamic.
+	 * NOTE: TransparentEntity are by default Dynamic.
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	setDynamic() {
-		const data16 = new Uint16Array(this.vertexData.buffer);
+		const data16 = new Uint16Array(this._vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			data16[i*VERTEX_SIZE_16 + OFFSET_DATA] &= CLEAR_STATIC_MATRIX_FLAG;
 		}
 	}
 
-	/*
-	 * Sets the Z position of the entity. Higher Z's get drawn on top.
-	 * int z: The Z value to set.
-	 * 		z value should be in the inclusive range(0, 65535)
-	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
-	 */
-	setZ(z) {
-		const data = new Uint16Array(this.vertexData.buffer);
+	_setZ(z) {
+		const data = new Uint16Array(this._vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			data[i*VERTEX_SIZE_16 + OFFSET_Z] = z;
 		}
 		this.z = z;
 	}
-
+	
 	/*
 	 * Sets the scale
-	 * float scaleX: Scales the x componet of the entity
+	 * float scaleX: Scales the x componet of the TransparentEntity
 	 * 		default scaleX = 1.0
-	 * float scaleY: Scales the y componet of the entity
+	 * float scaleY: Scales the y componet of the TransparentEntity
 	 * 		default scaleY = 1.0
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
@@ -232,7 +226,7 @@ export class Entity {
 	}
 
 	/*
-	 * Moves the point of rotation/scale of the entity.
+	 * Moves the point of rotation/scale of the TransparentEntity.
 	 * By default it is in the center of the square.
 	 * positive offset move the point of rotation/scale right and up, negative down and left
 	 *
@@ -249,14 +243,14 @@ export class Entity {
 	}
 
 	/*
-	 * Moves the entity by the given vector.
+	 * Moves the TransparentEntity by the given vector.
 	 *
 	 * float x: x value to tranlate
 	 * float y: y value to tranlate
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	translate(x, y) {
-		const data = new Float32Array(this.vertexData.buffer);
+		const data = new Float32Array(this._vertexData.buffer);
 		//top right
 		data[OFFSET_TOP_LEFT_X] += x;
 		data[OFFSET_TOP_LEFT_Y] += y;
@@ -274,7 +268,7 @@ export class Entity {
 	}
 
 	/*
-	 * Moves the entity to the given vector.
+	 * Moves the TransparentEntity to the given vector.
 	 *
 	 * float x: x value to tranlate to
 	 * float y: y value to tranlate to
@@ -287,7 +281,7 @@ export class Entity {
 	}
 
 	/*
-	 * Rotates the entity by a given angle.
+	 * Rotates the TransparentEntity by a given angle.
 	 *
 	 * float rads: angle in radians to rotate
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
@@ -303,7 +297,7 @@ export class Entity {
 	}
 
 	/*
-	 * Rotates the entity to a given angle.
+	 * Rotates the TransparentEntity to a given angle.
 	 *
 	 * float rads: angle in radians to rotate
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
@@ -315,7 +309,7 @@ export class Entity {
 	}
 
 	/*
-	 * Rotates the entity to a given vector.
+	 * Rotates the TransparentEntity to a given vector.
 	 * 	(1,0) rotates to (x,y) (does not strech)
 	 * float rads: angle in radians to rotate to
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
@@ -329,7 +323,7 @@ export class Entity {
 	}
 
 	/*
-	 * Rotates the entity by a given vector.
+	 * Rotates the TransparentEntity by a given vector.
 	 * 	the curretn (1,0) rotates to (x,y) (does not strech)
 	 * float rads: angle in radians to rotate
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
@@ -349,10 +343,10 @@ export class Entity {
 	/*
 	 * Applies a transformation from the currently set info (translation, trig/angle, scale, offset)
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
-	 * NOTE: this should not be needed to be called outside of the Entity class.
+	 * NOTE: this should not be needed to be called outside of the TransparentEntity class.
 	 */
 	transform() {
-		const data = new Float32Array(this.vertexData.buffer);
+		const data = new Float32Array(this._vertexData.buffer);
 		//top left
 		var v = Vec2(-1.0, 1.0);
 		transformVec2(v, this.translation, this.trig, this.scale, this.offset);

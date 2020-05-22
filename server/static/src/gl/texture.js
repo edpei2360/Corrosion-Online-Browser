@@ -1,5 +1,5 @@
 import {gl} from "./glManager.js"
-import {mainShader} from "./shader.js"
+import {mainShader, transparentShader} from "./shader.js"
 import {stopLoading} from "./loading.js"
 
 export var textureAtlase;
@@ -76,6 +76,7 @@ export class TextureAtlas {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		
 		mainShader.setUniformUInt("textures" + this.texSlot, this.texSlot);
+		transparentShader.setUniformUInt("textures" + this.texSlot, this.texSlot);
 		
 		this.loaded = true;
 		textureLoaded();

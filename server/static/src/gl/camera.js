@@ -1,5 +1,5 @@
 import {Mat4ortho} from "../math.js"
-import {mainShader} from "./shader.js"
+import {mainShader, transparentShader} from "./shader.js"
 
 //tmp
 	const width = 24;
@@ -13,6 +13,7 @@ export function setCamera(x, y) {
 	cameraPos[1] = y;
 	const projectionMatrix = Mat4ortho(x, y, width, height);
 	mainShader.setUniformMat4("uProjectionMatrix", projectionMatrix);
+	transparentShader.setUniformMat4("uProjectionMatrix", projectionMatrix);
 }
 
 //TODO: more optimized implemention

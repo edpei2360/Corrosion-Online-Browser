@@ -1,14 +1,117 @@
 import {VertexBuffer} from './vertexbuffer.js'
 import {gl} from "./glManager.js"
-import {mainShader} from "./shader.js"
+import {mainShader, transparentShader} from "./shader.js"
 import {mainEB} from "./elementbuffer.js"
+import {transparentEntityArray} from "../transparententity.js"
 import {entityArray} from "../entity.js"
-import {VERTEXS_PER_ENTITY, INDEXS_PER_ENTITY, ENTITY_SIZE_8, VERTEX_BUFFER_SIZE} from "./global.js"
+import {VERTEXS_PER_ENTITY, INDEXS_PER_ENTITY, ENTITY_SIZE_8, VERTEX_BUFFER_SIZE, ENTITIES_PER_BUFFER} from "./global.js"
 
 class VertexArrayIndex {
 	constructor(vertexArray, offset) {
 		this.vertexArray = vertexArray;
 		this.offset = offset;
+	}
+}
+
+export const transparentVertexArrays = [];
+export function setTransparentData(index, data) {
+	transparentVertexArrays[Math.floor(index/ENTITIES_PER_BUFFER)].setData((index%ENTITIES_PER_BUFFER)*ENTITY_SIZE_8, data);
+}
+
+export function addTransparentVertexArray() {
+	const va = new VertexArray();
+	va.use();
+	
+	va.addAttribute("aVertexPosition", 2, gl.FLOAT);
+	va.addAttribute("aZ", 1, gl.UNSIGNED_SHORT, false, true);
+	va.addAttribute("aData", 1, gl.UNSIGNED_SHORT, true);
+	va.addAttribute("aVertexColor", 4, gl.UNSIGNED_BYTE, false, true);
+	va.addAttribute("aTextureCords", 2, gl.UNSIGNED_SHORT, false, true);
+	
+	va.setAttributes(transparentShader);
+	mainEB.use();
+	transparentVertexArrays.push(va);
+}
+
+export function removeTransparentVertexArray() {
+	var removed = transparentVertexArrays.pop();
+	removed.remove();
+}
+
+export function getTransparentEntity(e) {
+	//tell vertex array to draw another entity
+	if (transparentEntityArray.length % ENTITIES_PER_BUFFER == 0) {
+		//need new va
+		addTransparentVertexArray();
+	}
+	
+	//tell va to draw one more entity
+	transparentVertexArrays[transparentVertexArrays.length - 1].addVertexs(VERTEXS_PER_ENTITY);
+	transparentVertexArrays[transparentVertexArrays.length - 1].addIndexs(INDEXS_PER_ENTITY);
+	
+	//bin search to find index
+	var left = 0;
+	var right = Math.max(0, transparentEntityArray.length-1);
+	while (left != right) {
+		var mid = Math.floor((left + right) / 2);
+		if (transparentEntityArray[mid].z < e.z) {
+			left = Math.min(mid + 1, right);
+		} else if (transparentEntityArray[mid].z > e.z) {
+			right = Math.max(mid - 1, left);
+		} else {
+			while(transparentEntityArray[mid].z == e.z && mid < right) {
+				mid++;
+			}
+			left = mid;
+			right = mid;
+		}
+	}
+	
+	//insert element
+	transparentEntityArray.splice(left, 0, e);
+	
+	//update indexs
+	for (var i = left; i < transparentEntityArray.length; i++) {
+		const e = transparentEntityArray[i];
+		e.index = i;
+	}
+	
+	//updates GPU data
+	insertTranparentData(left);
+}
+
+function insertTranparentData(index) {
+	while (index < transparentEntityArray.length) {
+		const startindex = index;
+		const entities = Math.min(ENTITIES_PER_BUFFER-(index%ENTITIES_PER_BUFFER), transparentEntityArray.length - index)
+		const data = new Uint8Array(ENTITY_SIZE_8*entities);
+		for (var i = 0; i < entities; i+=ENTITY_SIZE_8) {
+			data.set(transparentEntityArray[index].vertexData, i);
+			index++;
+		}
+		setTransparentData(startindex, data);
+	}
+}
+
+export function removeTransparentEntity(e) {
+	//update indexs
+	transparentEntityArray.splice(e.index, 1);
+	for (var i = e.index; i < transparentEntityArray.length; i++) {
+		const e = transparentEntityArray[i];
+		e.index = i;
+	}
+	
+	//update GPU
+	insertTranparentData(e.index);
+	
+	//tell va to draw one less entity
+	transparentVertexArrays[transparentVertexArrays.length - 1].removeVertexs(VERTEXS_PER_ENTITY);
+	transparentVertexArrays[transparentVertexArrays.length - 1].removeIndexs(INDEXS_PER_ENTITY);
+	
+	//check if va is empty
+	if (transparentVertexArrays[transparentVertexArrays.length - 1].getVertexCount() == 0) {
+		//remove empty va
+		removeTransparentVertexArray();
 	}
 }
 
@@ -28,7 +131,7 @@ function addVertexArray() {
 	va.use();
 	
 	va.addAttribute("aVertexPosition", 2, gl.FLOAT);
-	va.addAttribute("aZ", 1, gl.UNSIGNED_SHORT, false, true);//normalized?
+	va.addAttribute("aZ", 1, gl.UNSIGNED_SHORT, false, true);
 	va.addAttribute("aData", 1, gl.UNSIGNED_SHORT, true);
 	va.addAttribute("aVertexColor", 4, gl.UNSIGNED_BYTE, false, true);
 	va.addAttribute("aTextureCords", 2, gl.UNSIGNED_SHORT, false, true);
@@ -80,7 +183,7 @@ export function removeEntity(entity) {
 		entityArray[entity.index] = back;
 		back.index = entity.index;
 		back.vertexs = entity.vertexs;
-		back.sendDataToGPU();
+		back.sendDataToGPU();//TODO: could cause glitch (CPU side data != GPU data)
 	}
 	
 	//check if vertexarray can be removed
