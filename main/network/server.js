@@ -1,4 +1,11 @@
-// dependencies/*
+/* TODO:
+ *      fix the file organizations and imports for server
+ *      fix the file organizations for client side networking into the files michael made
+ *      ^(netcode connects to main player and player and they connect to main)
+*/
+
+
+// dependencies
 var socketIO = require('socket.io');
 var routing = require('./routing.js');
 

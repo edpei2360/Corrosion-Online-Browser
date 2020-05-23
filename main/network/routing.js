@@ -20,13 +20,13 @@ module.exports = {
   // bind port and etablish sending of static folder
   establish: function() {
     app.set('port', PORT);
-    app.use('/static', express.static(__dirname + '/static'));
+    app.use('/static', express.static(path.dirname(__dirname) + '/static'));
   },
 
   // give the client the web page
   route: function() {
     app.get('/', function(request, response) {
-      response.sendFile(path.join(__dirname, 'index.html'));
+      response.sendFile(path.join(path.dirname(__dirname), 'index.html'));
     });
   },
 

@@ -46,7 +46,7 @@ export function loaded() {
 		e.sendDataToGPU();
 
 		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM",0,0,1,10);
-		
+
 		//adds red tint
 		const colors = [[255,0,0,128],[0,255,0,128],[0,0,255,128]];
 		const arr = [];
