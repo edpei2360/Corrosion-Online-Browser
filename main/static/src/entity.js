@@ -210,6 +210,9 @@ export class Entity {
 	 * NOTE: e.sendDataToGPU() must be called to update what is seen on screen.
 	 */
 	setZ(z) {
+		if (z < 0 || z > 0xffff) {
+			throw "invalid z value"
+		}
 		const data = new Uint16Array(this.vertexData.buffer);
 		for (var i = 0; i < VERTEXS_PER_ENTITY; i++) {
 			data[i*VERTEX_SIZE_16 + OFFSET_Z] = z;

@@ -11,6 +11,7 @@ var key_input = {
 // listen for certain key inputs
 // subject to change and may be moved into new file
 document.addEventListener('keydown', function(event) {
+	console.log(event);
   switch (event.keyCode) {
     case 65: // A
       key_input.left = true;

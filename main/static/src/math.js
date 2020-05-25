@@ -131,3 +131,7 @@ export function transformVec2(v, trans, trig, scale, offset){
 export function Vec2(x=0.0, y=0.0) {
 	return new Float32Array([x, y]);
 }
+
+export function Vec2i(x=0, y=0) {
+	return new Int32Array([x, y]);
+}

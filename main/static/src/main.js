@@ -45,20 +45,15 @@ export function loaded() {
 		e.transform();
 		e.sendDataToGPU();
 
-		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM",0,0,1,10);
-
-		//adds red tint
-		const colors = [[255,0,0,128],[0,255,0,128],[0,0,255,128]];
-		const arr = [];
-		for (var x = -4; x < 4; x++) {
-			var tint = new TransparentEntity(201);
-			tint.setColor(...colors[(x+4)%3]);
-			tint.translateTo(x,x);
-			tint.sendDataToGPU();
-			arr.push(tint);
-		}
-		arr[3].remove();
-		arr[5].remove();
+		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM", 1);
+		t.sendDataToGPU();
+		
+		var border = new TransparentEntity(0);
+		border.translateTo(...t.getMiddle());
+		border.setScale(...t.getSize());
+		border.setColor(255, 255, 255, 150);
+		border.setStatic();
+		border.sendDataToGPU();
 	//test
 
 
