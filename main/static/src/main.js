@@ -16,6 +16,9 @@
  * 	send rotation data as vector and use rotateToVec
  * 	keep main player in center of screen using entity.setStatic() (will need to setScale)
  *
+ *  move all the player stuff into different sub folders (getters/setters to modif	y variables)
+ *  merge local data and playersDict, server data will stay the same but use the new player class to merge
+ *
  * 	key/mouse bind system
  */
 
@@ -27,14 +30,16 @@ import {Entity} from "./entity.js"
 import {TransparentEntity} from "./transparententity.js"
 import {texPoop, texCircle} from "./gl/texture.js"
 import {Text} from "./text.js"
+import {Player} from "./player.js"
 
 function main() {
 	glInit();
 }
 
-var playersDict = {};
-var localData;
+//var playersDict = {};
+var localData = {};
 var serverData;
+
 export function loaded() {
 	setCamera(0, 0);
 
@@ -47,7 +52,7 @@ export function loaded() {
 
 		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM", 1);
 		t.sendDataToGPU();
-		
+
 		var border = new TransparentEntity(0);
 		border.translateTo(...t.getMiddle());
 		border.setScale(...t.getSize());
@@ -62,12 +67,14 @@ export function loaded() {
 	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mouseup", onMouseUp);
 
+
 	//tell server new player has connected
 	socket.emit('new player');
 
 	socket.on('remove player', function(data) {
+		localData[data].e.remove(); // idk if this is needed
 		delete localData[data];
-		playersDict[data].remove();
+		//playersDict[data].remove();
 		delete playersDict[data];
 	});
 
@@ -75,12 +82,21 @@ export function loaded() {
 	// should only be used as position reference
 	socket.on('update local log', function(players, id) {
 	  localData = players;
-		// add new entity
-		playersDict[id] = new Entity();
 
+		// loop may be inefficent, replace with getters and setter and not create new object
+		for (var id in players) {
+			localData[id] = new Player(players[id].x_pos_player, players[id].y_pos_player,
+																 players[id].p_vel, players[id].rotation);
+			localData[id].draw();
+		}
+
+
+		// add new entity
+		//playersDict[id] = new Entity();
+/*
 		// if client is missing any entites add them to local storage
 		for(var id in players) {
-			if (!(id in playersDict)) {
+			if (!(id in localData)) {
 				playersDict[id] = new Entity();
 				playersDict[id].setTexture(texCircle); // change others texture
 				playersDict[id].setZ(100);//need good value
@@ -95,18 +111,15 @@ export function loaded() {
 		playersDict[id].translateTo(0,0);//change to position given by server
 		playersDict[id].setZ(200);//need good value
 		playersDict[id].sendDataToGPU()
-	});
 
-	socket.on('remove player', function(data) {
-		delete localData[data];
-		playersDict[data].remove();
-		delete playersDict[data];
+		*/
 	});
 
 	// stores the data that was transmitted by the server
 	socket.on('transmit', function(players) {
 	  serverData = players;
 	});
+
 
 	told = performance.now();
 	setInterval(loop, 1000/60); //60 times a second could go full speed but idk
@@ -128,9 +141,11 @@ function moveTo(p_id) {
     localData[p_id].x_pos_player = serverData[p_id].x_pos_player
   }
 
+	localData[p_id].draw();
+
 	// draw sub frames of movement
-	playersDict[p_id].translateTo(localData[p_id].x_pos_player * 0.1,localData[p_id].y_pos_player * 0.1);
-	playersDict[p_id].sendDataToGPU();
+	//playersDict[p_id].translateTo(localData[p_id].x_pos_player * 0.1,localData[p_id].y_pos_player * 0.1);
+	//playersDict[p_id].sendDataToGPU();
 }
 
 var told;

@@ -1,3 +1,5 @@
+// this is a nodejs module 
+
 // dependencies
 var socketIO = require('socket.io');
 var express = require('express');
@@ -9,11 +11,6 @@ var server = http.Server(app);
 var io = socketIO(server);
 
 var PORT = 5000;
-
-/* TODO:
- * put server.js and routing.js in seperate folders while not breaking routing
- * do the send file "{root:}" thingy or the require thingy
-*/
 
 // export routing functions
 module.exports = {

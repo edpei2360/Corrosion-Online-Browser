@@ -1,4 +1,4 @@
-import {getEntity, setData, removeEntity} from "./gl/vertexarray.js"
+	import {getEntity, setData, removeEntity} from "./gl/vertexarray.js"
 import {Vec2, transformVec2} from "./math.js"
 import {ENTITY_SIZE_8, VERTEXS_PER_ENTITY, VERTEX_SIZE_8, VERTEX_SIZE_16} from "./gl/global.js"
 
@@ -79,7 +79,7 @@ const COS = 1;
  * NOTE:
  * 	e.remove() must be called to actually stop the TransparentEntity from being drawn.
  * NOTE:
- * 	e.translateTo(x, y) must be called to begin drawing the entity
+ * 	e.translateTEntityo(x, y) must be called to begin drawing the entity
  */
 export class Entity {
 	constructor(scaleX = 1.0, scaleY = 1.0, offsetX = 0.0, offsetY = 0.0) {

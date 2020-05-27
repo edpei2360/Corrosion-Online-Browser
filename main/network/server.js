@@ -1,5 +1,4 @@
 /* TODO:
- *      fix the file organizations and imports for server
  *      fix the file organizations for client side networking into the files michael made
  *      ^(netcode connects to main player and player and they connect to main)
 */
@@ -32,14 +31,16 @@ io.on('connection', function(socket) {
 // setters and getters for this are below
 var players = {};
 
-// returns value of x pos of player with certain id
+/*
+
+// returns value of x pos of a player in a dictionary with certain id
 function getPlayerXPos(players, id) {
   if (id in players){
     return players[id].x_pos_player;
   }
 }
 
-// sets value of x pos of player with certain id
+// sets value of x pos of a player in a dictionary with certain id
 // requires that position is valid
 function setPlayerXPos(players, id, newPos) {
   if (id in players){
@@ -47,14 +48,14 @@ function setPlayerXPos(players, id, newPos) {
   }
 }
 
-// returns value of y pos of player with certain id
+// returns value of y pos of a player in a dictionary with certain id
 function getPlayerYPos(players, id) {
   if (id in players){
     return players[id].y_pos_player;
   }
 }
 
-// sets value of y pos of player with certain id
+// sets value of y pos of a player in a dictionary with certain id
 // requires that position is valid
 function setPlayerYPos(players, id, newPos) {
   if (id in players){
@@ -62,20 +63,22 @@ function setPlayerYPos(players, id, newPos) {
   }
 }
 
-// returns velocity of player with certain id
+// returns velocity of a player in a dictionary with certain id
 function getPlayerVel(players, id) {
   if (id in players){
     return players[id].p_vel;
   }
 }
 
-// sets value of the velocity of player with certain id
+// sets value of the velocity of a player in a dictionary with certain id
 // requires that new velocity is valid
 function setPlayerYPos(players, id, newVel) {
   if (id in players){
     players[id].p_vel = newVel;
   }
 }
+
+*/
 
 // handles new players and movement
 io.on('connection', function(socket) {
@@ -87,7 +90,8 @@ io.on('connection', function(socket) {
     players[socket.id] = {
       x_pos_player: 0,
       y_pos_player: 0,
-      p_vel : 1
+      p_vel : 1,
+      rotation : [0, 0]
     };
     io.sockets.emit('update local log', players, socket.id);
   });
