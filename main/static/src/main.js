@@ -18,6 +18,7 @@
  *
  *  move all the player stuff into different sub folders (getters/setters to modif	y variables)
  *  merge local data and playersDict, server data will stay the same but use the new player class to merge
+ *	make sure the interpolation still works with the new player class system!!!
  *
  * 	key/mouse bind system
  */
@@ -81,13 +82,20 @@ export function loaded() {
 	// store a temporary version of the data every time new player joins
 	// should only be used as position reference
 	socket.on('update local log', function(players, id) {
-	  localData = players;
+	  //localData = players;
 
 		// loop may be inefficent, replace with getters and setter and not create new object
 		for (var id in players) {
-			localData[id] = new Player(players[id].x_pos_player, players[id].y_pos_player,
-																 players[id].p_vel, players[id].rotation);
-			localData[id].draw();
+			if (!(id in localData)) {
+				localData[id] = new Player(players[id].x_pos_player, players[id].y_pos_player,
+																	 players[id].p_vel, players[id].rotation);
+				localData[id].draw();
+			} else {
+				localData[id].setX(players[id].x_pos_player);
+				localData[id].setY(players[id].y_pos_player);
+				localData[id].setVel(players[id].p_vel);
+				localData[id].setRot(players[id].rotation);
+			}
 		}
 
 

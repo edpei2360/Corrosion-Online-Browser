@@ -44,4 +44,12 @@ export class Player{
     return this.p_vel;
   }
 
+  setRot(newRot) {
+    this.rotation = newRot;
+  }
+
+  getRot() {
+    return this.rotation;
+  }
+
 }
