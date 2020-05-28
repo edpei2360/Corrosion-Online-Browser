@@ -15,7 +15,7 @@ export class Player{
 
   draw() {
     this.e.setTexture(texCircle);
-		this.e.translateTo(this.x_pos_player * 0.1,this.y_pos_player * 0.1); // * 0.1 is temp should be fixed
+		this.e.translateTo(this.x_pos_player,this.y_pos_player);
 		this.e.sendDataToGPU();
   }
 
@@ -50,6 +50,21 @@ export class Player{
 
   getRot() {
     return this.rotation;
+  }
+
+  moveTo(diffX, diffY, serX, serY) {
+    this.y_pos_player += diffY/10;
+    this.x_pos_player += diffX/10;
+
+    // prevent the calculations going on forever
+    if(Math.abs(diffY) < 0.5) {
+      this.y_pos_player = serY;
+    }
+    if(Math.abs(diffX) < 0.5) {
+      this.x_pos_player = serX;
+    }
+
+    this.draw();
   }
 
 }

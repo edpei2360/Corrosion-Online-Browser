@@ -90,10 +90,10 @@ io.on('connection', function(socket) {
     players[socket.id] = {
       x_pos_player: 0,
       y_pos_player: 0,
-      p_vel : 1,
+      p_vel : 0.1,
       rotation : [0, 0]
     };
-    io.sockets.emit('update local log', players, socket.id);
+    io.sockets.emit('update local log', players); // this emit MIGHT be broken!!
   });
 
   // check the connect sockets id and effect its position

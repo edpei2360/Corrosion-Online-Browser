@@ -18,7 +18,7 @@
  *
  *  move all the player stuff into different sub folders (getters/setters to modif	y variables)
  *  merge local data and playersDict, server data will stay the same but use the new player class to merge
- *	make sure the interpolation still works with the new player class system!!!
+ *	make sure the interpolation still works with the new player class system!!!! (fix jumping bug somehow)
  *
  * 	key/mouse bind system
  */
@@ -79,13 +79,9 @@ export function loaded() {
 		delete playersDict[data];
 	});
 
-	// store a temporary version of the data every time new player joins
-	// should only be used as position reference
-	socket.on('update local log', function(players, id) {
-	  //localData = players;
-
-		// loop may be inefficent, replace with getters and setter and not create new object
-		for (var id in players) {
+	// updates local storage to match server storage when a new client joins
+	socket.on('update local log', function(players) {
+		for(var id in players) {
 			if (!(id in localData)) {
 				localData[id] = new Player(players[id].x_pos_player, players[id].y_pos_player,
 																	 players[id].p_vel, players[id].rotation);
@@ -97,30 +93,6 @@ export function loaded() {
 				localData[id].setRot(players[id].rotation);
 			}
 		}
-
-
-		// add new entity
-		//playersDict[id] = new Entity();
-/*
-		// if client is missing any entites add them to local storage
-		for(var id in players) {
-			if (!(id in localData)) {
-				playersDict[id] = new Entity();
-				playersDict[id].setTexture(texCircle); // change others texture
-				playersDict[id].setZ(100);//need good value
-			}
-			// draw all players that are not main player
-			playersDict[id].setTexture(texCircle);
-			playersDict[id].translateTo(localData[id].x_pos_player * 0.1,localData[id].y_pos_player * 0.1);
-			playersDict[id].sendDataToGPU();
-		}
-		// draw main player
-		playersDict[id].setTexture(texCircle); // change main player texture
-		playersDict[id].translateTo(0,0);//change to position given by server
-		playersDict[id].setZ(200);//need good value
-		playersDict[id].sendDataToGPU()
-
-		*/
 	});
 
 	// stores the data that was transmitted by the server
@@ -131,29 +103,6 @@ export function loaded() {
 
 	told = performance.now();
 	setInterval(loop, 1000/60); //60 times a second could go full speed but idk
-}
-
-// moves player by small increments to their new position
-function moveTo(p_id) {
-  var difference_y = serverData[p_id].y_pos_player - localData[p_id].y_pos_player;
-  var difference_x = serverData[p_id].x_pos_player - localData[p_id].x_pos_player;
-
-  localData[p_id].y_pos_player += difference_y/10;
-  localData[p_id].x_pos_player += difference_x/10;
-
-  // prevent the calculations going on forever
-  if(Math.abs(difference_y) < 0.5) {
-    localData[p_id].y_pos_player = serverData[p_id].y_pos_player
-  }
-  if(Math.abs(difference_x) < 0.5) {
-    localData[p_id].x_pos_player = serverData[p_id].x_pos_player
-  }
-
-	localData[p_id].draw();
-
-	// draw sub frames of movement
-	//playersDict[p_id].translateTo(localData[p_id].x_pos_player * 0.1,localData[p_id].y_pos_player * 0.1);
-	//playersDict[p_id].sendDataToGPU();
 }
 
 var told;
@@ -169,7 +118,9 @@ function loop() {
   for (var id in localData) {
     while ((localData[id].x_pos_player != serverData[id].x_pos_player) ||
         (localData[id].y_pos_player != serverData[id].y_pos_player)) {
-      moveTo(id);
+				var diffY = serverData[id].y_pos_player - localData[id].y_pos_player;
+				var diffX = serverData[id].x_pos_player - localData[id].x_pos_player;
+      	localData[id].moveTo(diffX, diffY, serverData[id].x_pos_player, serverData[id].y_pos_player);
     }
   }
 }
