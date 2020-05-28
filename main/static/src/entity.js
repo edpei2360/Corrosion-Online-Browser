@@ -79,7 +79,7 @@ const COS = 1;
  * NOTE:
  * 	e.remove() must be called to actually stop the TransparentEntity from being drawn.
  * NOTE:
- * 	e.translateTEntityo(x, y) must be called to begin drawing the entity
+ * 	e.translateTo(x, y) must be called to begin drawing the entity
  */
 export class Entity {
 	constructor(scaleX = 1.0, scaleY = 1.0, offsetX = 0.0, offsetY = 0.0) {

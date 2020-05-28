@@ -12,7 +12,7 @@ import {Vec2, Vec2i} from "./math.js"
  * 	_initEntities
  */
  
-export const CENTERED = 0;
+export const CENTERED = 0; //global file
 export const LEFT = 1;
 export const RIGHT = 2;
 export const TOP = 1;
@@ -53,9 +53,6 @@ export class Text {
 	}
 	
 	setZ(z) {
-		if (z < 0 || z > 0xffff) {
-			throw "invalid z value"
-		}
 		for (var i in this.entities) {
 			this.entities[i].setZ(z);
 		}
@@ -162,8 +159,8 @@ export class Text {
 				this._charAt(this.position[0] - offsetX, this.position[1] - offsetY);
 				var c = line.charCodeAt(j);
 				//space
-				if (c == 32) {
-					offsetX += this.charSize[0] + this.charPadding[0];
+				if (c === 32) {
+					offsetX -= this.charSize[0] + this.charPadding[0];
 					continue;
 				}
 				var e = new Entity(this.charSize[0]*0.5, this.charSize[1]*0.5);

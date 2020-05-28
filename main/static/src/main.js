@@ -1,16 +1,9 @@
 /*
  * TODO:
- * 	semitransparent entities
- * 	text
- *
- *  fix entites only being drawn after moving!!
- *
  * 	documentation :(
  * 	fix annoying warning "XMLHttpRequest on the main thread ..."
  *
  * 	put interpolation in to player.js
- *
- * 	rotation only effect mainplayer
  *
  * 	move movement calculations onto client side
  * 	send rotation data as vector and use rotateToVec
@@ -28,9 +21,8 @@ var socket = io();
 import {glInit, canvas} from "./gl/glManager.js"
 import {setCamera, moveCamera} from "./gl/camera.js"
 import {Entity} from "./entity.js"
-import {TransparentEntity} from "./transparententity.js"
+import {Button} from "./button.js"
 import {texPoop, texCircle} from "./gl/texture.js"
-import {Text} from "./text.js"
 import {Player} from "./player.js"
 
 function main() {
@@ -44,30 +36,19 @@ var serverData;
 export function loaded() {
 	setCamera(0, 0);
 
-	//text test
-		//background
-		var e = new Entity(100,100);
-		e.setColor(128,128,128);
-		e.transform();
-		e.sendDataToGPU();
-
-		var t = new Text(0,0, "AYYLMAO\nTEXT\nQWERTYUIOPASDFGHJKLZXCVBNM", 1);
-		t.sendDataToGPU();
-
-		var border = new TransparentEntity(0);
-		border.translateTo(...t.getMiddle());
-		border.setScale(...t.getSize());
-		border.setColor(255, 255, 255, 150);
-		border.setStatic();
-		border.sendDataToGPU();
+	//button test Todo hitboxs call func
+		var b = new Button(0, 0, 0xff, "BUTTON TEST\nHONK", 0, 255, 0, 128, -1, 
+		-1, 1, 0, 0 , 5,  5, 10, 14, 1, 1, 0, 0);
+		b.sendDataToGPU();
 	//test
 
 
 	//mouse stuff
+	/*
 	canvas.addEventListener("mousemove", onMouseMove);
 	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mouseup", onMouseUp);
-
+	*/
 
 	//tell server new player has connected
 	socket.emit('new player');
@@ -126,21 +107,3 @@ function loop() {
 }
 
 window.onload = main;
-
-function onMouseMove(evt) {
-	const rect = canvas.getBoundingClientRect();
-	const x = evt.clientX - rect.left - 320;
-	const y = rect.top + 240 - evt.clientY;
-	//TODO only effect mainPlayer
-	for (var id in playersDict) {
-    var ent = playersDict[id];
-		ent.rotateToVec(x, y);
-		ent.sendDataToGPU();
-  }
-}
-
-function onMouseDown(evt) {
-}
-
-function onMouseUp(evt) {
-}
