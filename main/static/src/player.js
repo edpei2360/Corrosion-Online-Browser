@@ -19,7 +19,6 @@ export class Player{
 		this.e.sendDataToGPU();
   }
 
-
   setX(newX) {
     this.x_pos_player = newX;
   }

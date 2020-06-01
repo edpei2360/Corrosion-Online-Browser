@@ -3,7 +3,6 @@
  *      ^(netcode connects to main player and player and they connect to main)
 */
 
-
 // dependencies
 var socketIO = require('socket.io');
 var routing = require('./routing.js');
@@ -30,55 +29,6 @@ io.on('connection', function(socket) {
 // create empty dictionary to store players in
 // setters and getters for this are below
 var players = {};
-
-/*
-
-// returns value of x pos of a player in a dictionary with certain id
-function getPlayerXPos(players, id) {
-  if (id in players){
-    return players[id].x_pos_player;
-  }
-}
-
-// sets value of x pos of a player in a dictionary with certain id
-// requires that position is valid
-function setPlayerXPos(players, id, newPos) {
-  if (id in players){
-    players[id].x_pos_player = newPos;
-  }
-}
-
-// returns value of y pos of a player in a dictionary with certain id
-function getPlayerYPos(players, id) {
-  if (id in players){
-    return players[id].y_pos_player;
-  }
-}
-
-// sets value of y pos of a player in a dictionary with certain id
-// requires that position is valid
-function setPlayerYPos(players, id, newPos) {
-  if (id in players){
-    players[id].y_pos_player = newPos;
-  }
-}
-
-// returns velocity of a player in a dictionary with certain id
-function getPlayerVel(players, id) {
-  if (id in players){
-    return players[id].p_vel;
-  }
-}
-
-// sets value of the velocity of a player in a dictionary with certain id
-// requires that new velocity is valid
-function setPlayerYPos(players, id, newVel) {
-  if (id in players){
-    players[id].p_vel = newVel;
-  }
-}
-
-*/
 
 // handles new players and movement
 io.on('connection', function(socket) {

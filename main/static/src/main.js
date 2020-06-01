@@ -9,7 +9,7 @@
  * 	send rotation data as vector and use rotateToVec
  * 	keep main player in center of screen using entity.setStatic() (will need to setScale)
  *
- *  move all the player stuff into different sub folders (getters/setters to modif	y variables)
+ *  move all the player stuff into different sub folders (getters/setters to modify variables)
  *  merge local data and playersDict, server data will stay the same but use the new player class to merge
  *	make sure the interpolation still works with the new player class system!!!! (fix jumping bug somehow)
  *
@@ -29,7 +29,6 @@ function main() {
 	glInit();
 }
 
-//var playersDict = {};
 var localData = {};
 var serverData;
 
@@ -37,7 +36,7 @@ export function loaded() {
 	setCamera(0, 0);
 
 	//button test Todo hitboxs call func
-		var b = new Button(0, 0, 0xff, "BUTTON TEST\nHONK", 0, 255, 0, 128, -1, 
+		var b = new Button(0, 0, 0xff, "BUTTON TEST\nHONK", 0, 255, 0, 128, -1,
 		-1, 1, 0, 0 , 5,  5, 10, 14, 1, 1, 0, 0);
 		b.sendDataToGPU();
 	//test
@@ -96,6 +95,7 @@ function loop() {
   key_input.time_modification = t;
 	socket.emit('key input', key_input);
 
+	// interpolation call
   for (var id in localData) {
     while ((localData[id].x_pos_player != serverData[id].x_pos_player) ||
         (localData[id].y_pos_player != serverData[id].y_pos_player)) {
@@ -104,6 +104,7 @@ function loop() {
       	localData[id].moveTo(diffX, diffY, serverData[id].x_pos_player, serverData[id].y_pos_player);
     }
   }
+
 }
 
 window.onload = main;
