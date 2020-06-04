@@ -1,6 +1,7 @@
 import {texText} from "./gl/texture.js"
 import {Entity} from "./entity.js"
 import {Vec2, Vec2i} from "./math.js"
+import {CENTERED, LEFT, RIGHT, TOP, BOTTOM, PROJECTION_MATRIX, STATIC_MATRIX} from "./global.js"
 
 /*
  * TODO: can improve
@@ -11,14 +12,6 @@ import {Vec2, Vec2i} from "./math.js"
  * 	setText
  * 	_initEntities
  */
- 
-export const CENTERED = 0; //global file
-export const LEFT = 1;
-export const RIGHT = 2;
-export const TOP = 1;
-export const BOTTOM = 2;
-export const PROJECTION_MATRIX = 0;
-export const STATIC_MATRIX = 1;
 
 export class Text {
 	constructor(x, y, text, z = 0, horizontalAlign = CENTERED, verticalAlign = CENTERED,

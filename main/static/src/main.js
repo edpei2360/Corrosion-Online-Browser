@@ -24,6 +24,7 @@ import {Entity} from "./entity.js"
 import {Button} from "./button.js"
 import {texPoop, texCircle} from "./gl/texture.js"
 import {Player} from "./player.js"
+import {onMouseDown, onMouseMove} from "./input/mouseevents.js" 
 
 function main() {
 	glInit();
@@ -35,16 +36,25 @@ var serverData;
 export function loaded() {
 	setCamera(0, 0);
 
-	//button test Todo hitboxs call func
+	//button test todo hoveroff
 		var b = new Button(0, 0, 0xff, "BUTTON TEST\nHONK", 0, 255, 0, 128, -1,
 		-1, 1, 0, 0 , 5,  5, 10, 14, 1, 1, 0, 0);
+		b.onHover(function(t) {
+			t.background.setColor(255,0,0,128);
+			t.sendDataToGPU();
+		});
+		b.onClick(function(t) {
+			alert("AYYYYY");
+		});
 		b.sendDataToGPU();
 	//test
 
 
 	//mouse stuff
-	/*
+	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mousemove", onMouseMove);
+
+	/*
 	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mouseup", onMouseUp);
 	*/

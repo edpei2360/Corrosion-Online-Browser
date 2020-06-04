@@ -1,22 +1,49 @@
-//list of functions: function(event)
-export const MOUSE_DOWN = [];
-export const MOUSE_UP = [];
-export const MOUSE_MOVE = [];
+import {click, hover} from "../collision/clickbox.js"
+import {canvas} from "../gl/glManager.js"
+import {Mat3transformVec2} from "../math.js"
+import {inverseStaticMatrix, inverseDynamicMatrix} from "../gl/camera.js"
 
-function onMouseMove(e) {
-	for (var i in MOUSE_MOVE) {
-		MOUSE_MOVE[i](e);
+export function onMouseMove(e) {
+	var x;
+	var y;
+	if (e.pageX || e.pageY) { 
+		x = e.pageX;
+		y = e.pageY;
 	}
+	else { 
+		x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+		y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+	} 
+	x -= canvas.offsetLeft;
+	y -= canvas.offsetTop;
+	x = 2*x/canvas.width-1;
+	y = 1-2*y/canvas.height;
+	
+	hover(Mat3transformVec2(inverseDynamicMatrix ,[x,y]),
+		Mat3transformVec2(inverseStaticMatrix,[x,y]));
 }
 
-function onMouseDown(e) {
-	for (var i in MOUSE_MOVE) {
-		MOUSE_MOVE[i](e);
+export function onMouseDown(e) {
+	//TODO cleaning
+	var x;
+	var y;
+	if (e.pageX || e.pageY) { 
+		x = e.pageX;
+		y = e.pageY;
 	}
+	else { 
+		x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+		y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+	} 
+	x -= canvas.offsetLeft;
+	y -= canvas.offsetTop;
+	x = 2*x/canvas.width-1;
+	y = 1-2*y/canvas.height;
+	
+	click(Mat3transformVec2(inverseDynamicMatrix ,[x,y]),
+		Mat3transformVec2(inverseStaticMatrix,[x,y]));
+	
 }
 
-function onMouseUp(e) {
-	for (var i in MOUSE_MOVE) {
-		MOUSE_MOVE[i](e);
-	}
+export function onMouseUp(e) {
 }

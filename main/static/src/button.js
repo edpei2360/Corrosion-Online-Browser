@@ -2,9 +2,9 @@ import {Vec2, Vec2i} from "./math.js"
 import {Entity} from "./entity.js"
 import {TransparentEntity} from "./transparententity.js"
 import {Text} from "./text.js"
-
-/*
- * hitbox
+import {CENTERED, LEFT, RIGHT, TOP, BOTTOM, PROJECTION_MATRIX, STATIC_MATRIX, AUTO_SIZE} from "./global.js"
+import {BoundingBox, CLICK, HOVER} from "./collision/clickbox.js"
+/* TODO
  * gets/sets
  * 
  * position
@@ -13,22 +13,12 @@ import {Text} from "./text.js"
  * padding
  * 
  * background
- * clickbox
  * 
  * charsettings
  * 		charSize
  * 		charPadding
  * 		charAlign
  */
- 
-export const CENTERED = 0; //global file
-export const LEFT = 1;
-export const RIGHT = 2;
-export const TOP = 1;
-export const BOTTOM = 2;
-export const PROJECTION_MATRIX = 0; 
-export const STATIC_MATRIX = 1;
-export const AUTO_SIZE = -1;
 
 export class Button {
 	constructor(x, y, z, text, r, g, b, a = 255, sizeX = AUTO_SIZE, sizeY = AUTO_SIZE, 
@@ -53,13 +43,31 @@ export class Button {
 			this.background.setColor(r, g, b, a);
 		}
 		
-		//this.clickBox = new ClickBox(); // TODO clickboxs
-		
 		this.setMatrix(matrix);
 		
 		this._autosize();
 		this.translateTo(x, y);
 	}
+	
+	onHover(func) {
+		var points = [[this.position[0] + this.actualSize[0], this.position[1] + this.actualSize[1]], 
+			[this.position[0] - this.actualSize[0], this.position[1] - this.actualSize[1]]];
+		if (this.hoverBox != undefined) {
+			this.hoverBox.remove();
+		}
+		this.hoverBox = new BoundingBox(points, this.background.z, this.matrix, HOVER, func, this);
+	}
+	
+	onClick(func) {
+		var points = [[this.position[0] + this.actualSize[0], this.position[1] + this.actualSize[1]], 
+			[this.position[0] - this.actualSize[0], this.position[1] - this.actualSize[1]]];
+		if (this.clickBox != undefined) {
+			this.clickBox.remove();
+		}
+		this.clickBox = new BoundingBox(points, this.background.z, this.matrix, CLICK, func, this);
+	}
+	
+	onHoverOff(func) { throw "not Implemented"; } //other functions?
 	
 	sendDataToGPU() {
 		this.text.sendDataToGPU();

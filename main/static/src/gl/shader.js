@@ -1,5 +1,6 @@
 import {gl} from "./glManager.js"
 import {Mat4ortho} from "../math.js"
+import {initStaticMatrix} from "./camera.js"
 
 export var mainShader;
 export var transparentShader;
@@ -7,6 +8,8 @@ export var transparentShader;
 export function initShaders() {
 	initMainShader();
 	initTransparentShaders();
+	
+	initStaticMatrix();
 }
 
 function initMainShader() {
@@ -19,9 +22,6 @@ function initMainShader() {
 	mainShader.addUniform("uProjectionMatrix");
 	mainShader.addUniform("uStaticMatrix");
 	mainShader.addUniform("uTexture");
-	
-	//set uStaticMatrix
-	mainShader.setUniformMat4("uStaticMatrix", Mat4ortho(0, 0, 640, 480));
 }
 
 function initTransparentShaders() {
@@ -34,9 +34,6 @@ function initTransparentShaders() {
 	transparentShader.addUniform("uProjectionMatrix");
 	transparentShader.addUniform("uStaticMatrix");
 	transparentShader.addUniform("uTexture");
-	
-	//set uStaticMatrix
-	transparentShader.setUniformMat4("uStaticMatrix", Mat4ortho(0, 0, 640, 480));
 }
 
 //gets shader source code

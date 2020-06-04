@@ -24,6 +24,16 @@ export function Mat4ortho(x, y, width, height) {
 		return out;
 }
 
+export function Mat3orthoInv(x, y, width, height) {
+		const out = new Float32Array(9);
+		out[0] = width*0.5;
+		out[4] = height*0.5;
+		out[6] = 2*x;
+		out[7] = 2*y;
+		out[8] = 1;
+		return out;
+}
+
 export function Mat4() {
 	return new Float32Array(16);
 }

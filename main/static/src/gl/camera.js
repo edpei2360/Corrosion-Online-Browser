@@ -1,5 +1,18 @@
-import {Mat4ortho} from "../math.js"
+import {Mat4ortho, Mat3orthoInv} from "../math.js"
 import {mainShader, transparentShader} from "./shader.js"
+
+export var staticMatrix;  //4x4
+export var dynamicMatrix; //4x4
+export var inverseDynamicMatrix; //3x3
+export var inverseStaticMatrix; //3x3
+
+export function initStaticMatrix() {
+	staticMatrix = Mat4ortho(0, 0, 640, 480);
+	inverseStaticMatrix = Mat3orthoInv(0, 0, 640, 480);
+	
+	mainShader.setUniformMat4("uStaticMatrix", staticMatrix);
+	transparentShader.setUniformMat4("uStaticMatrix", staticMatrix);
+}
 
 //tmp
 	const width = 24;
@@ -11,9 +24,12 @@ const cameraPos = new Float32Array(2);
 export function setCamera(x, y) {
 	cameraPos[0] = x;
 	cameraPos[1] = y;
-	const projectionMatrix = Mat4ortho(x, y, width, height);
-	mainShader.setUniformMat4("uProjectionMatrix", projectionMatrix);
-	transparentShader.setUniformMat4("uProjectionMatrix", projectionMatrix);
+	
+	dynamicMatrix = Mat4ortho(x, y, width, height);
+	inverseDynamicMatrix = Mat3orthoInv(x, y, width, height);
+	
+	mainShader.setUniformMat4("uProjectionMatrix", dynamicMatrix);
+	transparentShader.setUniformMat4("uProjectionMatrix", dynamicMatrix);
 }
 
 //TODO: more optimized implemention
