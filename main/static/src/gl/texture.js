@@ -20,6 +20,9 @@ export function textureLoaded() {
 	export var texCircle;
 	export const texText = {};
 //
+/*
+ * TODO create and settup actual textures
+ */
 export function generateSubTextures() {
 	//tmp
 		texPoop = textureAtlase.getTexture(0, 0, 254, 256);

@@ -5,7 +5,7 @@ export class Player{
   constructor(x_pos_player, y_pos_player, p_vel, rotation){
     this.e = new Entity; // store entity within player
     this.e.setTexture(texCircle); // change others texture
-		this.e.setZ(100); //need good value
+    this.e.setZ(100); //need good value
 
     this.x_pos_player = x_pos_player;
     this.y_pos_player = y_pos_player;
@@ -14,9 +14,8 @@ export class Player{
   }
 
   draw() {
-    this.e.setTexture(texCircle);
-		this.e.translateTo(this.x_pos_player,this.y_pos_player);
-		this.e.sendDataToGPU();
+    this.e.translateTo(this.x_pos_player,this.y_pos_player);
+    this.e.sendDataToGPU();
   }
 
   setX(newX) {
@@ -56,13 +55,12 @@ export class Player{
     this.x_pos_player += diffX/10;
 
     // prevent the calculations going on forever
-    if(Math.abs(diffY) < 0.5) {
+    if(Math.abs(diffY) < 0.05) { //may need to change value so its smooth and doesnt go on forever
       this.y_pos_player = serY;
     }
-    if(Math.abs(diffX) < 0.5) {
+    if(Math.abs(diffX) < 0.05) { //may need to change value so its smooth and doesnt go on forever
       this.x_pos_player = serX;
     }
-
     this.draw();
   }
 

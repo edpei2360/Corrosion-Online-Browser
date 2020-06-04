@@ -3,8 +3,11 @@ import {Entity} from "./entity.js"
 import {TransparentEntity} from "./transparententity.js"
 import {Text} from "./text.js"
 import {CENTERED, LEFT, RIGHT, TOP, BOTTOM, PROJECTION_MATRIX, STATIC_MATRIX, AUTO_SIZE} from "./global.js"
-import {BoundingBox, CLICK, HOVER} from "./collision/clickbox.js"
+import {ClickBoundingBox, CLICK, HOVER} from "./collision/clickbox.js"
+
 /* TODO
+ * hover off
+ * 
  * gets/sets
  * 
  * position
@@ -55,7 +58,7 @@ export class Button {
 		if (this.hoverBox != undefined) {
 			this.hoverBox.remove();
 		}
-		this.hoverBox = new BoundingBox(points, this.background.z, this.matrix, HOVER, func, this);
+		this.hoverBox = new ClickBoundingBox(points, this.background.z, this.matrix, HOVER, func, this);
 	}
 	
 	onClick(func) {
@@ -64,7 +67,7 @@ export class Button {
 		if (this.clickBox != undefined) {
 			this.clickBox.remove();
 		}
-		this.clickBox = new BoundingBox(points, this.background.z, this.matrix, CLICK, func, this);
+		this.clickBox = new ClickBoundingBox(points, this.background.z, this.matrix, CLICK, func, this);
 	}
 	
 	onHoverOff(func) { throw "not Implemented"; } //other functions?

@@ -1,4 +1,7 @@
-//TODO keypress event handler for typing and stuff
+/* TODO 
+ * 	keypress event handler for typing and stuff
+ * 	multiple binds???
+ */
 
 //dictionaries key: keyCode(aka int), item function()
 export const KEY_DOWN = {};

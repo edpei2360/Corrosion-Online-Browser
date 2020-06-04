@@ -1,3 +1,8 @@
+/*
+ * TODO
+ * 	total refactor
+ */
+
 import {click, hover} from "../collision/clickbox.js"
 import {canvas} from "../gl/glManager.js"
 import {Mat3transformVec2} from "../math.js"
@@ -24,7 +29,6 @@ export function onMouseMove(e) {
 }
 
 export function onMouseDown(e) {
-	//TODO cleaning
 	var x;
 	var y;
 	if (e.pageX || e.pageY) { 

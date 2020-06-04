@@ -1,8 +1,10 @@
 /*
  * TODO:
  * 	documentation :(
+ * 	
  * 	fix annoying warning "XMLHttpRequest on the main thread ..."
- *
+ * 	fix serverData[id] is undefined
+ * 
  * 	put interpolation in to player.js
  *
  * 	move movement calculations onto client side
@@ -11,9 +13,42 @@
  *
  *  move all the player stuff into different sub folders (getters/setters to modify variables)
  *  merge local data and playersDict, server data will stay the same but use the new player class to merge
- *	make sure the interpolation still works with the new player class system!!!! (fix jumping bug somehow)
- *
- * 	key/mouse bind system
+ *	make sure the interpolation still works with the new player class system!!!! (fix jumping bug somehow) possibly fixed
+ * 
+ * 	Button
+ * 		hoverOff()
+ * 		setters (and getters?)
+ * 
+ * 	Entity
+ * 		minor optimizations
+ * 
+ * 	TransparentEntity
+ * 		minor optimizations
+ * 
+ * 	Text
+ * 		minor optimizations
+ * 		getters?
+ * 
+ * 	ClickBox
+ * 		minor optimizations
+ * 		general geometry and intersection
+ * 
+ * 	Loading
+ * 		actual loading screen
+ * 
+ * 	Textures
+ * 		create and setup actual final textures
+ * 
+ * 	VertexArray
+ * 		possible bug (look more into)
+ * 
+ * 	KeyEvents
+ * 		modular binding system so users can have custom key binds
+ * 		move keyinput to work with keyevent system (need keyevent system implemented first)
+ * 
+ * 	MouseEvents
+ * 		modular binding system so users can have custom mousekey/scroll binds
+ * 	
  */
 
 var socket = io();
@@ -35,7 +70,7 @@ var serverData;
 
 export function loaded() {
 	setCamera(0, 0);
-
+	
 	//button test todo hoveroff
 		var b = new Button(0, 0, 0xff, "BUTTON TEST\nHONK", 0, 255, 0, 128, -1,
 		-1, 1, 0, 0 , 5,  5, 10, 14, 1, 1, 0, 0);
@@ -49,8 +84,12 @@ export function loaded() {
 		b.sendDataToGPU();
 	//test
 
-
+	//TODO: move to input/mouseevents
 	//mouse stuff
+	//enables right clicking on canvas
+	canvas.oncontextmenu = function() {
+		return false;
+	}
 	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mousemove", onMouseMove);
 
@@ -58,15 +97,14 @@ export function loaded() {
 	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mouseup", onMouseUp);
 	*/
-
+	
+	//TODO: move into network folder
 	//tell server new player has connected
 	socket.emit('new player');
 
 	socket.on('remove player', function(data) {
-		localData[data].e.remove(); // idk if this is needed
+		localData[data].e.remove();
 		delete localData[data];
-		//playersDict[data].remove();
-		delete playersDict[data];
 	});
 
 	// updates local storage to match server storage when a new client joins
@@ -106,6 +144,12 @@ function loop() {
 	socket.emit('key input', key_input);
 
 	// interpolation call
+	/* TODO: fix
+	 * 	causes error (serverData[id] not defined)
+	 * 	possible fix:
+	 * 		where ever localData[id] is inited serverData[id] should be inited before
+	 * 		where ever localData[id] is deleted serverData[id] should be deleted after
+	 */
   for (var id in localData) {
     while ((localData[id].x_pos_player != serverData[id].x_pos_player) ||
         (localData[id].y_pos_player != serverData[id].y_pos_player)) {
@@ -114,7 +158,6 @@ function loop() {
       	localData[id].moveTo(diffX, diffY, serverData[id].x_pos_player, serverData[id].y_pos_player);
     }
   }
-
 }
 
 window.onload = main;

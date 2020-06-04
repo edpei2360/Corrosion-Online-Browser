@@ -104,7 +104,7 @@ class ClickBox {
 	intersectsPolygon() {throw "Not implemented";}
 }
 
-export class Point extends ClickBox {
+export class ClickPoint extends ClickBox {
 	constructor(x, y, z, matrix, listener, func, parent) {
 		super(z, matrix, listener, func, parent);
 		this.x = x;
@@ -112,7 +112,7 @@ export class Point extends ClickBox {
 	}
 }
 
-export class BoundingBox extends ClickBox {
+export class ClickBoundingBox extends ClickBox {
 	constructor(points, z, matrix, listener, func, parent) {
 		super(z, matrix, listener, func, parent);
 		
@@ -138,3 +138,99 @@ export class BoundingBox extends ClickBox {
 	}
 }
 
+/* 
+ * TODO:
+ * rename to ClickNAME
+ * more general geometry classes so can use with hitbox and other stuff
+ * drawing geometry for debugging
+ * 
+ * 	Point
+		containsPoint() {throw "Not implemented";}
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";} //can use Bounding box implementation
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ * 	Line
+		containsPoint() {throw "Not implemented";}
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";}
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ * 	Ray
+		containsPoint() {throw "Not implemented";}
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";}
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ * 	LineSegment
+		containsPoint() {throw "Not implemented";}
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";}
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ * 	BoundingBox
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";}
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ * 	rotatedBox
+		containsPoint() {throw "Not implemented";}
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";}
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ * 	circle
+		containsPoint() {throw "Not implemented";}
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";}
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ * 	triangle
+		containsPoint() {throw "Not implemented";}
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";}
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ * 	polygon
+		containsPoint() {throw "Not implemented";}
+		intersectsLine() {throw "Not implemented";}
+		intersectsRay() {throw "Not implemented";}
+		intersectsLineSegment() {throw "Not implemented";}
+		intersectsBoundingBox() {throw "Not implemented";}
+		intersectsRotatedBox() {throw "Not implemented";}
+		intersectsCircle() {throw "Not implemented";}
+		intersectsTriangle() {throw "Not implemented";}
+		intersectsPolygon() {throw "Not implemented";}
+ */

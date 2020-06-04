@@ -14,10 +14,9 @@ export function initStaticMatrix() {
 	transparentShader.setUniformMat4("uStaticMatrix", staticMatrix);
 }
 
-//tmp
-	const width = 24;
-	const height = 18;
-//
+
+const width = 24;
+const height = 18;
 const cameraPos = new Float32Array(2);
 
 //sets the camera position
@@ -32,7 +31,6 @@ export function setCamera(x, y) {
 	transparentShader.setUniformMat4("uProjectionMatrix", dynamicMatrix);
 }
 
-//TODO: more optimized implemention
 export function moveCamera(x, y) {
 	setCamera(cameraPos[0]+x, cameraPos[1]+y);
 }

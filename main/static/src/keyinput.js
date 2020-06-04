@@ -1,3 +1,5 @@
+//TODO: move to work with input/keyevents
+
 // basic IO used to test if the server is able to transmit
 // how keys will be pressed
 var key_input = {

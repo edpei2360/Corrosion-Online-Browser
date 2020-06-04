@@ -1,4 +1,4 @@
-	import {getEntity, setData, removeEntity} from "./gl/vertexarray.js"
+import {getEntity, setData, removeEntity} from "./gl/vertexarray.js"
 import {Vec2, transformVec2} from "./math.js"
 import {ENTITY_SIZE_8, VERTEXS_PER_ENTITY, VERTEX_SIZE_8, VERTEX_SIZE_16} from "./gl/global.js"
 

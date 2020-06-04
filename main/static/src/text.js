@@ -11,6 +11,8 @@ import {CENTERED, LEFT, RIGHT, TOP, BOTTOM, PROJECTION_MATRIX, STATIC_MATRIX} fr
  * 	setAlign
  * 	setText
  * 	_initEntities
+ * 
+ * 	getters?
  */
 
 export class Text {
