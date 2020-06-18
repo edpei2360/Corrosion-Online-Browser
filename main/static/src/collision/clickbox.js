@@ -1,46 +1,49 @@
-import {STATIC_MATRIX} from "../global.js"
+import {STATIC_MATRIX, PROJECTION_MATRIX} from "../global.js"
+import {Point} from "./geom/point.js"
 
 const clickBoxes_Hover = [];
-const clickBoxes_Click = [];
+const clickBoxes_Primary = [];
 
 //listen
-export const CLICK = 0;
+export const PRIMARY_FUNC = 0;
 export const HOVER = 1;
 
 export function hover(d, s) {
+	d = new Point(...d, PROJECTION_MATRIX);
+	s = new Point(...s, STATIC_MATRIX);
+	
 	for (var i in clickBoxes_Hover) {
 		const c = clickBoxes_Hover[i];
-		
-		var x, y;
-		if (c.matrix == STATIC_MATRIX) {
-			x = s[0];
-			y = s[1];
+
+		var p;
+		if (c.getMatrix() == STATIC_MATRIX) {
+			p = s;
 		} else {
-			x = d[0];
-			y = d[1];
+			p = d;
 		}
 		
-		if (c.containsPoint(x,y)) {
+		if (c.containsPoint(p)) {
 			c.call();
 			return;
 		}
 	}
 }
 
-export function click(d, s) {
-	for (var i in clickBoxes_Click) {
-		const c = clickBoxes_Click[i];
+export function primary_func(d, s) {
+	d = new Point(...d, PROJECTION_MATRIX);
+	s = new Point(...s, STATIC_MATRIX);
+	
+	for (var i in clickBoxes_Primary) {
+		const c = clickBoxes_Primary[i];
 		
-		var x, y;
-		if (c.matrix == STATIC_MATRIX) {
-			x = s[0];
-			y = s[1];
+		var p;
+		if (c.getMatrix() == STATIC_MATRIX) {
+			p = s;
 		} else {
-			x = d[0];
-			y = d[1];
+			p = d;
 		}
 		
-		if (c.containsPoint(x,y)) {
+		if (c.containsPoint(p)) {
 			c.call();
 			return;
 		}
@@ -50,8 +53,8 @@ export function click(d, s) {
 function addClickBox(listen, clickBox) {
 	//get listener arr
 	var l;
-	if (listen == CLICK) {
-		l = clickBoxes_Click;
+	if (listen == PRIMARY_FUNC) {
+		l = clickBoxes_Primary;
 	} else if(listen == HOVER) {
 		l = clickBoxes_Hover;
 	} else {
@@ -61,7 +64,7 @@ function addClickBox(listen, clickBox) {
 	//TODO: bin search instead of linear
 	//find index to insert
 	var index = 0;
-	const z = clickBox.z;
+	const z = clickBox.getZ();
 	while (index < l.length && l[index].z > z) {
 		index++;
 	}
@@ -75,13 +78,12 @@ function removeClickBox(c) {
 	if (index !== -1) array.splice(index, 1);
 }
 
-class ClickBox {
-	constructor(z, matrix, listener, func, parent) {
-		this.z = z;
-		this.matrix = matrix;
+export class ClickBox {
+	constructor(geom, listener, func, parent) {
+		this.geom = geom;
 		this.listener = listener;
 		this.func = func;
-		this.parent = parent
+		this.parent = parent;
 		addClickBox(listener, this);
 	}
 	
@@ -93,144 +95,47 @@ class ClickBox {
 		removeClickBox(this);
 	}
 	
-	containsPoint() {throw "Not implemented";}
-	intersectsLine() {throw "Not implemented";}
-	intersectsRay() {throw "Not implemented";}
-	intersectsLineSegment() {throw "Not implemented";}
-	intersectsBoundingBox() {throw "Not implemented";}
-	intersectsRotatedBox() {throw "Not implemented";}
-	intersectsCircle() {throw "Not implemented";}
-	intersectsTriangle() {throw "Not implemented";}
-	intersectsPolygon() {throw "Not implemented";}
-}
-
-export class ClickPoint extends ClickBox {
-	constructor(x, y, z, matrix, listener, func, parent) {
-		super(z, matrix, listener, func, parent);
-		this.x = x;
-		this.y = y;
-	}
-}
-
-export class ClickBoundingBox extends ClickBox {
-	constructor(points, z, matrix, listener, func, parent) {
-		super(z, matrix, listener, func, parent);
-		
-		this.maxX = points[0][0];
-		this.minX = points[0][0];
-		
-		this.maxY = points[0][1];
-		this.minY = points[0][1];
-		
-		for (var i = 1; i < points.length; i++) {
-			const x = points[i][0];
-			const y = points[i][1];
-			if (this.maxX < x) { this.maxX = x}
-			if (this.minX > x) { this.minX = x}
-			if (this.maxY < y) { this.maxY = y}
-			if (this.minY > y) { this.minY = y}
-		}
+	getZ() {
+		return this.geom.z;
 	}
 	
-	containsPoint(x, y) {
-		return (this.maxX >= x && this.minX <= x) &&
-			(this.maxY >= y && this.minY <= y)
+	getMatrix() {
+		return this.geom.matrix;
+	}
+	
+	containsPoint(p) {
+		return this.geom.containsPoint(p);
+	}
+	
+	intersectsLine(l) {
+		return this.geom.intersectsLine(l);
+	}
+	
+	intersectsRay(r) {
+		return this.geom.intersectsRay(r);
+	}
+	
+	intersectsLineSegment(l) {
+		return this.geom.intersectsLineSegment(l);
+	}
+	
+	intersectsBoundingBox(b) {
+		return this.geom.intersectsBoundingBox(b);
+	}
+	
+	intersectsRotatedBox(b) {
+		return this.geom.intersectsRotatedBox(b);
+	}
+	
+	intersectsCircle(c) {
+		return this.geom.intersectsCircle(c);
+	}
+	
+	intersectsTriangle(t) {
+		return this.geom.intersectsTriangle(t);
+	}
+	
+	intersectsPolygon(p) {
+		return this.geom.intersectsPolygon(p);
 	}
 }
-
-/* 
- * TODO:
- * rename to ClickNAME
- * more general geometry classes so can use with hitbox and other stuff
- * drawing geometry for debugging
- * 
- * 	Point
-		containsPoint() {throw "Not implemented";}
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";} //can use Bounding box implementation
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- * 	Line
-		containsPoint() {throw "Not implemented";}
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";}
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- * 	Ray
-		containsPoint() {throw "Not implemented";}
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";}
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- * 	LineSegment
-		containsPoint() {throw "Not implemented";}
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";}
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- * 	BoundingBox
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";}
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- * 	rotatedBox
-		containsPoint() {throw "Not implemented";}
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";}
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- * 	circle
-		containsPoint() {throw "Not implemented";}
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";}
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- * 	triangle
-		containsPoint() {throw "Not implemented";}
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";}
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- * 	polygon
-		containsPoint() {throw "Not implemented";}
-		intersectsLine() {throw "Not implemented";}
-		intersectsRay() {throw "Not implemented";}
-		intersectsLineSegment() {throw "Not implemented";}
-		intersectsBoundingBox() {throw "Not implemented";}
-		intersectsRotatedBox() {throw "Not implemented";}
-		intersectsCircle() {throw "Not implemented";}
-		intersectsTriangle() {throw "Not implemented";}
-		intersectsPolygon() {throw "Not implemented";}
- */

@@ -11,13 +11,15 @@
  * 	send rotation data as vector and use rotateToVec
  * 	keep main player in center of screen using entity.setStatic() (will need to setScale)
  *
- *  move all the player stuff into different sub folders (getters/setters to modify variables)
- *  merge local data and playersDict, server data will stay the same but use the new player class to merge
- *	make sure the interpolation still works with the new player class system!!!! (fix jumping bug somehow) possibly fixed
+ * 	move all the player stuff into different sub folders (getters/setters to modify variables)
+ * 	merge local data and playersDict, server data will stay the same but use the new player class to merge
+ * 	make sure the interpolation still works with the new player class system!!!! (fix jumping bug somehow) possibly fixed
  * 
  * 	Button
  * 		hoverOff()
  * 		setters (and getters?)
+ * 		one hitbox
+ * 		tranforms
  * 
  * 	Entity
  * 		minor optimizations
@@ -32,6 +34,10 @@
  * 	ClickBox
  * 		minor optimizations
  * 		general geometry and intersection
+ * 
+ * 	Geometry
+ * 		intersection functions
+ * 		translations
  * 
  * 	Loading
  * 		actual loading screen
@@ -59,7 +65,7 @@ import {Entity} from "./entity.js"
 import {Button} from "./button.js"
 import {texPoop, texCircle} from "./gl/texture.js"
 import {Player} from "./player.js"
-import {onMouseDown, onMouseMove} from "./input/mouseevents.js" 
+import {onMouseDown, onMouseMove, onMouseUp} from "./input/mouseevents.js" 
 
 function main() {
 	glInit();
@@ -92,11 +98,7 @@ export function loaded() {
 	}
 	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mousemove", onMouseMove);
-
-	/*
-	canvas.addEventListener("mousedown", onMouseDown);
 	canvas.addEventListener("mouseup", onMouseUp);
-	*/
 	
 	//TODO: move into network folder
 	//tell server new player has connected

@@ -3,10 +3,12 @@ import {Entity} from "./entity.js"
 import {TransparentEntity} from "./transparententity.js"
 import {Text} from "./text.js"
 import {CENTERED, LEFT, RIGHT, TOP, BOTTOM, PROJECTION_MATRIX, STATIC_MATRIX, AUTO_SIZE} from "./global.js"
-import {ClickBoundingBox, CLICK, HOVER} from "./collision/clickbox.js"
+import {ClickBox, PRIMARY_FUNC, HOVER} from "./collision/clickbox.js"
+import {BoundingBox} from "./collision/geom/boundingbox.js"
 
-/* TODO
- * hover off
+/* 
+ * TODO:
+ * 	hover off
  * 
  * gets/sets
  * 
@@ -18,9 +20,9 @@ import {ClickBoundingBox, CLICK, HOVER} from "./collision/clickbox.js"
  * background
  * 
  * charsettings
- * 		charSize
- * 		charPadding
- * 		charAlign
+ * 	charSize
+ * 	charPadding
+ * 	charAlign
  */
 
 export class Button {
@@ -58,7 +60,9 @@ export class Button {
 		if (this.hoverBox != undefined) {
 			this.hoverBox.remove();
 		}
-		this.hoverBox = new ClickBoundingBox(points, this.background.z, this.matrix, HOVER, func, this);
+		
+		const geom = new BoundingBox(points, this.background.z, this.matrix); //TODO: have one hitbox
+		this.hoverBox = new ClickBox(geom, HOVER, func, this);
 	}
 	
 	onClick(func) {
@@ -67,7 +71,9 @@ export class Button {
 		if (this.clickBox != undefined) {
 			this.clickBox.remove();
 		}
-		this.clickBox = new ClickBoundingBox(points, this.background.z, this.matrix, CLICK, func, this);
+		
+		const geom = new BoundingBox(points, this.background.z, this.matrix); //TODO: have one hitbox
+		this.clickBox = new ClickBox(geom, PRIMARY_FUNC, func, this);
 	}
 	
 	onHoverOff(func) { throw "not Implemented"; } //other functions?
@@ -107,9 +113,9 @@ export class Button {
 	}
 	
 	translateTo(x, y) {
-		this.position[0] = x;
-		this.position[1] = y;
-		
+		console.log("button.translateTo not fully implemented");
+		//TODO: change hitbox location
+		this.position = Vec2(x, y);
 		this._position();
 	}
 	
