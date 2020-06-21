@@ -6,7 +6,7 @@ export const TOP = 1;
 export const BOTTOM = 2;
 
 //matrix
-export const PROJECTION_MATRIX = 0; 
+export const PROJECTION_MATRIX = 0;
 export const STATIC_MATRIX = 1;
 
 //size
