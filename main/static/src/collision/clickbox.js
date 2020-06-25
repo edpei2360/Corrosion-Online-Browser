@@ -8,14 +8,30 @@ const clickBoxes_Primary = [];
 export const PRIMARY_FUNC = 0;
 export const HOVER = 1;
 
+var hovering = null;
 export function hover(d, s) {
 	d = new Point(...d, PROJECTION_MATRIX);
 	s = new Point(...s, STATIC_MATRIX);
+	var p;
+	if (hovering != null) {
+		if (hovering.getMatrix() == STATIC_MATRIX) {
+			p = s;
+		} else {
+			p = d;
+		}
+		
+		if (hovering.containsPoint(p)) {
+			return;
+		}
+		
+		if (typeof hovering.parent.hoverOff !== 'undefined') {
+			hovering.parent.hoverOff(hovering.parent);
+		}
+		hovering = null;
+	}
 	
 	for (var i in clickBoxes_Hover) {
 		const c = clickBoxes_Hover[i];
-
-		var p;
 		if (c.getMatrix() == STATIC_MATRIX) {
 			p = s;
 		} else {
@@ -23,6 +39,7 @@ export function hover(d, s) {
 		}
 		
 		if (c.containsPoint(p)) {
+			hovering = c;
 			c.call();
 			return;
 		}

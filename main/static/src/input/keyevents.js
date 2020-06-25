@@ -1,13 +1,14 @@
 /* TODO 
  * 	keypress event handler for typing and stuff
  * 	multiple binds???
+ * 	get mousepos at event
  */
 
 //dictionaries key: keyCode(aka int), item function()
 export const KEY_DOWN = {};
 export const KEY_UP = {};
 
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function(e) { 
 	if (e.keyCode in KEY_DOWN) {
 		KEY_DOWN[e.keyCode]();
 	}

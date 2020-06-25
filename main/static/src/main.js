@@ -14,9 +14,8 @@
  * 	make sure the interpolation still works with the new player class system!!!! (fix jumping bug somehow) possibly fixed
  *
  * 	Button
- * 		hoverOff()
  * 		setters (and getters?)
- * 		one hitbox
+ * 		one hitbox (minor optimization)
  * 		tranforms
  *
  * 	Entity
@@ -31,7 +30,6 @@
  *
  * 	ClickBox
  * 		minor optimizations
- * 		general geometry and intersection
  *
  * 	Geometry
  * 		intersection functions
@@ -52,7 +50,7 @@
  *
  * 	MouseEvents
  * 		modular binding system so users can have custom mousekey/scroll binds
- *
+ * 		scroll
  */
 
 import {glInit, canvas} from "./gl/glManager.js"
@@ -74,11 +72,15 @@ function main() {
 export function loaded() {
 	setCamera(0, 0);
 
-	//button test todo hoveroff
+	//button test
 		var b = new Button(0, 0, 0xff, "BUTTON TEST\nHONK", 0, 255, 0, 128, -1,
 		-1, 1, 0, 0 , 5,  5, 10, 14, 1, 1, 0, 0);
 		b.onHover(function(t) {
 			t.background.setColor(255,0,0,128);
+			t.sendDataToGPU();
+		});
+		b.onHoverOff(function(t) {
+			t.background.setColor(0,255,0,128);
 			t.sendDataToGPU();
 		});
 		b.onClick(function(t) {
@@ -111,7 +113,7 @@ function loop() {
 	told = tnow;
 
 	// send key inputs
-  key_input.time_modification = t;
+	key_input.time_modification = t;
 	socket.emit('key input', key_input);
 
 	// interpolation call

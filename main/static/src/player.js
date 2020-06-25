@@ -55,10 +55,10 @@ export class Player{
     this.x_pos_player += diffX/10;
 
     // prevent the calculations going on forever
-    if(Math.abs(diffY) < 0.05) { //may need to change value so its smooth and doesnt go on forever
+    if(Math.abs(diffY) < 0.005) { //may need to change value so its smooth and doesnt go on forever
       this.y_pos_player = serY;
     }
-    if(Math.abs(diffX) < 0.05) { //may need to change value so its smooth and doesnt go on forever
+    if(Math.abs(diffX) < 0.005) { //may need to change value so its smooth and doesnt go on forever
       this.x_pos_player = serX;
     }
     this.draw();

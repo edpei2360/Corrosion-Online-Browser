@@ -26,7 +26,7 @@ function draw() {
 var drawLoop = null;
 export function startDrawLoop() {
 	if (drawLoop != null) throw "draw loop already running";
-	drawLoop = setInterval(draw, 0);
+	drawLoop = setInterval(draw, 1000/60);
 	
 	loaded();
 }

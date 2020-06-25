@@ -8,8 +8,6 @@ import {BoundingBox} from "./collision/geom/boundingbox.js"
 
 /* 
  * TODO:
- * 	hover off
- * 
  * gets/sets
  * 
  * position
@@ -23,6 +21,8 @@ import {BoundingBox} from "./collision/geom/boundingbox.js"
  * 	charSize
  * 	charPadding
  * 	charAlign
+ * 
+ * transforms
  */
 
 export class Button {
@@ -76,7 +76,9 @@ export class Button {
 		this.clickBox = new ClickBox(geom, PRIMARY_FUNC, func, this);
 	}
 	
-	onHoverOff(func) { throw "not Implemented"; } //other functions?
+	onHoverOff(func) { 
+		this.hoverOff = func;
+	} //other functions?
 	
 	sendDataToGPU() {
 		this.text.sendDataToGPU();
@@ -113,9 +115,8 @@ export class Button {
 	}
 	
 	translateTo(x, y) {
-		console.log("button.translateTo not fully implemented");
-		//TODO: change hitbox location
-		this.position = Vec2(x, y);
+		this.position[0] = x;
+		this.position[1] = y;
 		this._position();
 	}
 	
@@ -142,6 +143,9 @@ export class Button {
 	}
 	
 	_position() {
+		//TODO: change hitbox location
+		console.log("button._position not fully implemented");
+		
 		var textX, textY, backX, backY;
 		if (this.buttonAlign[0] == CENTERED) {
 			backX = this.position[0];
